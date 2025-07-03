@@ -5,8 +5,8 @@ A customizable Home Assistant Lovelace badge that displays the current value of 
 ## Screenshots
 
 <!-- Update the URLs below to match your repository's location and branch/tag as needed -->
-![Dropdown Badge Example](https://github.com/evandepol/dropdown-list-badge/raw/main/dropdown.png)
-![Add Badge Dialog](https://github.com/evandepol/dropdown-list-badge/raw/main/dialog.png)
+![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
+![Rendered badge with dropdown menu](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dropdown.png)
 
 ## Features
 
