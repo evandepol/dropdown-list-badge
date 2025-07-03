@@ -1,4 +1,8 @@
 class DropdownListBadge extends HTMLElement {
+  // This is not documented in the main Home Assistant docs, but it is used 
+  // internally by the Lovelace UI to filter and list custom badges.
+  static type = "badge";
+
   constructor() {
     super();
     this._dropdownOpen = false;
@@ -136,6 +140,8 @@ class DropdownListBadge extends HTMLElement {
 
     const current = state.state;
     const options = this._config.options;
+    const name = this._config.name || "";
+    const icon = this._config.icon || "";
 
     this.innerHTML = `
       <style>
@@ -243,8 +249,27 @@ class DropdownListBadge extends HTMLElement {
           from { background: var(--accent-color, #ff9800); }
           to { background: var(--primary-color, #03a9f4); }
         }
+        .badge-name {
+          font-size: 11px;
+          color: var(--secondary-text-color, #888);
+          margin-bottom: 2px;
+          text-align: center;
+          font-weight: 400;
+          letter-spacing: 0.02em;
+        }
+        .badge-icon {
+          margin-right: 8px;
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          vertical-align: middle;
+          --mdc-icon-size: 18px;
+          color: var(--primary-color, #2196f3);
+          display: inline-block;
+        }
       </style>
       <div class="badge-wrapper">
+        ${name ? `<div class="badge-name">${name}</div>` : ""}
         <div
           class="dropdown-badge${this._dropdownOpen ? " open" : ""}"
           tabindex="0"
@@ -253,6 +278,7 @@ class DropdownListBadge extends HTMLElement {
           aria-haspopup="listbox"
           aria-expanded="${this._dropdownOpen ? "true" : "false"}"
         >
+          ${icon ? `<ha-icon class="badge-icon" icon="${icon}"></ha-icon>` : ""}
           <span class="dropdown-value">${current}</span>
           <span class="dropdown-arrow" aria-hidden="true">
             <svg width="18" height="18" viewBox="0 0 24 24">
@@ -440,6 +466,8 @@ class DropdownListBadgeEditor extends HTMLElement {
     }
     // Get selected options from config
     const selectedOptions = Array.isArray(this._config.options) ? this._config.options : [];
+    const name = this._config.name || "";
+    const icon = this._config.icon || "";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -490,6 +518,14 @@ class DropdownListBadgeEditor extends HTMLElement {
           </datalist>
           <div class="hint">Options will auto-populate from the entity. Use checkboxes to include/exclude.</div>
         </div>
+        <div>
+          <label for="badge-name">Name (optional)</label>
+          <input id="badge-name" type="text" value="${name}" placeholder="Badge name (optional)" />
+        </div>
+        <div>
+          <label for="badge-icon">Icon (optional, e.g. mdi:star)</label>
+          <input id="badge-icon" type="text" value="${icon}" placeholder="mdi:star" />
+        </div>
         <div class="options-list">
           <label>Options:</label>
           ${possibleOptions.length === 0
@@ -539,6 +575,21 @@ class DropdownListBadgeEditor extends HTMLElement {
           toFocus.setSelectionRange(caretPos, caretPos);
         }
       }
+    }
+
+    const nameInput = this.shadowRoot.getElementById("badge-name");
+    if (nameInput) {
+      nameInput.oninput = (e) => {
+        this._config.name = e.target.value;
+        this._emitConfigChanged();
+      };
+    }
+    const iconInput = this.shadowRoot.getElementById("badge-icon");
+    if (iconInput) {
+      iconInput.oninput = (e) => {
+        this._config.icon = e.target.value;
+        this._emitConfigChanged();
+      };
     }
   }
 }
