@@ -2,6 +2,12 @@
 
 A customizable Home Assistant Lovelace badge that displays the current value of an `input_select` (or similar entity) and allows users to quickly change its value from a dropdown menu. This badge is designed for a modern, accessible, and visually appealing experience, with advanced configuration and integration options.
 
+## Screenshots
+
+<!-- Update the URLs below to match your repository's location and branch/tag as needed -->
+![Dropdown Badge Example](https://github.com/evandepol/dropdown-list-badge/raw/main/dropdown.png)
+![Add Badge Dialog](https://github.com/evandepol/dropdown-list-badge/raw/main/dialog.png)
+
 ## Features
 
 - Displays the current value of a selectable entity (e.g., `input_select`).
@@ -13,6 +19,7 @@ A customizable Home Assistant Lovelace badge that displays the current value of 
 - Fully integrated with the Lovelace "Custom badges" picker.
 - Responsive, accessible, and keyboard-navigable UI.
 - Preserves focus and caret position in the editor for smooth editing.
+- Compact layout: badge height is always at least 36px, and adapts to content.
 
 ## Configuration
 
@@ -66,6 +73,7 @@ The badge includes a visual editor:
 - Start typing an entity ID; options will auto-populate.
 - Use checkboxes to include/exclude options.
 - Set an optional name and icon.
+- Editor preserves focus and caret position for smooth editing.
 
 ## Example
 
