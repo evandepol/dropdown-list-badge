@@ -161,12 +161,12 @@ class DropdownListBadge extends HTMLElement {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 36px;
+          min-height: 32px;
           height: auto;
           font-size: 12px;
           font-weight: 500;
-          line-height: 16px;
-          padding: 4px 10px;
+          line-height: 15px;
+          padding: 2px 8px; /* reduced vertical and horizontal padding */
           border-radius: 4px;
           border: 2px solid var(--primary-color, #2196f3);
           background: var(--ha-card-background, #fff);
@@ -187,21 +187,22 @@ class DropdownListBadge extends HTMLElement {
           align-items: center;
           justify-content: center;
           width: 100%;
+          margin: 0; /* remove any default margin */
         }
         .badge-name-inside {
-          font-size: 11px;
+          font-size: 10px;
           color: var(--secondary-text-color, #888);
           text-align: center;
           font-weight: 400;
           letter-spacing: 0.02em;
-          margin-bottom: 2px;
+          margin-bottom: 1px; /* reduced margin */
           width: 100%;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
         .badge-icon {
-          margin-right: 6px;
+          margin-right: 4px; /* slightly reduced */
           font-size: 18px;
           width: 18px;
           height: 18px;
