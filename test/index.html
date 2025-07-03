@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dropdown List Badge Test</title>
+    <script type="module" src="../dropdown-list-badge.js"></script>
+    <style>
+      body { font-family: sans-serif; margin: 2em; }
+    </style>
+  </head>
+  <body>
+    <dropdown-list-badge id="badge"></dropdown-list-badge>
+    <dropdown-list-badge-editor id="editor"></dropdown-list-badge-editor>
+    <script>
+      // Minimal mock hass object
+      window.hass = {
+        states: {
+          "input_select.example": {
+            state: "Option 1",
+            attributes: { options: ["Option 1", "Option 2", "Option 3"] }
+          }
+        },
+        callService: () => {}
+      };
+      document.getElementById('badge').setConfig({
+        entity: "input_select.example",
+        options: ["Option 1", "Option 2", "Option 3"],
+        name: "Test Badge",
+        icon: "mdi:star"
+      });
+      document.getElementById('badge').hass = window.hass;
+      document.getElementById('editor').setConfig({
+        entity: "input_select.example",
+        options: ["Option 1", "Option 2", "Option 3"]
+      });
+      document.getElementById('editor').hass = window.hass;
+    </script>
+  </body>
+</html>

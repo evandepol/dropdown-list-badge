@@ -1,0 +1,12 @@
+{
+  "name": "dropdown-list-badge-tests",
+  "private": true,
+  "devDependencies": {
+    "@playwright/test": "^1.44.0",
+    "serve": "^14.2.0"
+  },
+  "scripts": {
+    "serve": "serve -l 5000 .",
+    "test": "playwright test"
+  }
+}

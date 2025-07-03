@@ -99,7 +99,50 @@ icon: mdi:sofa
 - Enhanced editor with focus/caret preservation and dynamic option population.
 - Integrated with Lovelace "Custom badges" picker.
 
+## Development & Testing
+
+### Requirements
+
+- [Colima](https://github.com/abiosoft/colima) (or Docker Desktop) is the **only** system requirement.
+- All development and testing tools (Node.js, npm, Playwright, etc.) run inside a container. No global Node/npm install needed.
+
+### Quick Start
+
+1. **Start Colima (or Docker):**
+   ```sh
+   colima start
+   ```
+
+2. **Build and run the test suite:**
+   ```sh
+   docker build -t dropdown-list-badge-test .
+   docker run --rm -p 5000:5000 dropdown-list-badge-test npx serve -l 5000 . &
+   # Wait a moment for the server to start, then in another terminal:
+   docker run --rm --network host dropdown-list-badge-test npx playwright test
+   ```
+   Or, with a `docker-compose.yml`:
+   ```sh
+   docker-compose up --build
+   ```
+
+3. **Edit and re-run:**
+   - All code and tests are mounted into the container for live development (if using `docker-compose` with volumes).
+   - Test files are in the `tests/` directory (see `badge.spec.ts` for Playwright examples).
+   - The test page is at `test/index.html` and uses a mock Home Assistant environment.
+
+### What’s Tested
+
+- Visual rendering of the badge (with Playwright screenshot comparison)
+- Dropdown interaction (mouse and keyboard)
+- Option display and selection
+- Editor population, selection, and config propagation
+
+### Local Development
+
+- You can run the static server and Playwright tests inside the container, so no Node.js or Playwright install is needed on your host.
+- For advanced debugging, you can run Playwright in headed mode or open a shell in the container.
+
 ---
 
-For more details, see the comments in `dropdown-list-badge.js`.
+For more details, see the comments in `dropdown-list-badge.js` and the test files
 

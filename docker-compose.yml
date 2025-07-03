@@ -1,0 +1,11 @@
+# docker-compose.yml
+version: "3"
+services:
+  test:
+    build: .
+    command: >
+      sh -c "npx serve -l 5000 . & npx playwright test"
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
