@@ -596,3 +596,11 @@ class DropdownListBadgeEditor extends HTMLElement {
 
 customElements.define("dropdown-list-badge", DropdownListBadge);
 customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
+
+// register the custom card in Home Assistant so it shows up as a custom bade
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "dropdown-list-badge",
+  name: "Dropdown List Badge",
+  description: "A badge with a dropdown for input_select entities."
+});
