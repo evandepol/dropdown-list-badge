@@ -139,9 +139,9 @@ class DropdownListBadge extends HTMLElement {
     }
 
     // Debug output for name propagation
-    console.debug("DropdownListBadge: _render called");
-    console.debug("DropdownListBadge: this._config =", this._config);
-    console.debug("DropdownListBadge: this._config.name =", this._config.name);
+    // console.debug("DropdownListBadge: _render called");
+    // console.debug("DropdownListBadge: this._config =", this._config);
+    // console.debug("DropdownListBadge: this._config.name =", this._config.name);
 
     const current = state.state;
     const options = this._config.options;
@@ -161,12 +161,12 @@ class DropdownListBadge extends HTMLElement {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: 32px;
+          min-height: 36px;   /* Always at least 36px */
           height: auto;
           font-size: 11px;
           font-weight: 500;
           line-height: 11px;
-          padding: 2px 8px; /* reduced vertical and horizontal padding */
+          padding: 2px 8px;
           border-radius: 4px;
           border: 2px solid var(--primary-color, #2196f3);
           background: var(--ha-card-background, #fff);
@@ -414,14 +414,14 @@ class DropdownListBadgeEditor extends HTMLElement {
   }
 
   setConfig(config) {
-    console.log("DropdownListBadgeEditor: setConfig", config);
+    // console.log("DropdownListBadgeEditor: setConfig", config);
     const changed = JSON.stringify(this._config) !== JSON.stringify(config);
     this._config = { ...config };
     if (changed) this._render();
   }
 
   set hass(hass) {
-    console.log("DropdownListBadgeEditor: set hass");
+    // console.log("DropdownListBadgeEditor: set hass");
     const oldEntities = this._entities ? this._entities.join(",") : "";
     const newEntities = Object.keys(hass.states)
       .filter(eid => hass.states[eid].attributes.options)
@@ -438,14 +438,14 @@ class DropdownListBadgeEditor extends HTMLElement {
 
   _onEntityChanged(e) {
     const value = e.target.value;
-    console.log("DropdownListBadgeEditor: entity input changed", value);
+    // console.log("DropdownListBadgeEditor: entity input changed", value);
     this._config.entity = value;
     this._emitConfigChanged();
 
     // Debounce: wait after last keystroke before trying to fetch options
     if (this._debounceTimer) clearTimeout(this._debounceTimer);
     this._debounceTimer = setTimeout(() => {
-      console.log("DropdownListBadgeEditor: debounce timer fired for entity", value);
+      // console.log("DropdownListBadgeEditor: debounce timer fired for entity", value);
       if (this._hass && value && this._hass.states[value]) {
         const opts = this._hass.states[value].attributes.options;
         if (Array.isArray(opts)) {
@@ -458,7 +458,7 @@ class DropdownListBadgeEditor extends HTMLElement {
             const current = Array.isArray(this._config.options) ? this._config.options : [];
             this._config.options = opts.filter(opt => current.includes(opt));
           }
-          console.log("DropdownListBadgeEditor: options updated from entity", opts);
+          // console.log("DropdownListBadgeEditor: options updated from entity", opts);
           this._emitConfigChanged();
           this._render();
         }
@@ -480,14 +480,14 @@ class DropdownListBadgeEditor extends HTMLElement {
   }
 
   _emitConfigChanged() {
-    console.log("DropdownListBadgeEditor: config-changed", this._config);
+    // console.log("DropdownListBadgeEditor: config-changed", this._config);
     this.dispatchEvent(new CustomEvent("config-changed", {
       detail: { config: this._config }
     }));
   }
 
   _render() {
-    console.log("DropdownListBadgeEditor: _render");
+    // console.log("DropdownListBadgeEditor: _render");
     if (!this.shadowRoot) return;
 
     // Focus/caret preservation
@@ -586,8 +586,8 @@ class DropdownListBadgeEditor extends HTMLElement {
     // Attach event listeners
     const entityInput = this.shadowRoot.getElementById("entity");
     entityInput.oninput = this._onEntityChanged.bind(this);
-    entityInput.onfocus = () => console.log("DropdownListBadgeEditor: entity input focused");
-    entityInput.onblur = () => console.log("DropdownListBadgeEditor: entity input blurred");
+    // entityInput.onfocus = () => console.log("DropdownListBadgeEditor: entity input focused");
+    // entityInput.onblur = () => console.log("DropdownListBadgeEditor: entity input blurred");
     entityInput.onkeydown = (e) => {
       if (e.key === "Tab") {
         const val = entityInput.value.trim().toLowerCase();
