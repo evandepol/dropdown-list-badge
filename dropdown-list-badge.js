@@ -138,6 +138,11 @@ class DropdownListBadge extends HTMLElement {
       return;
     }
 
+    // Debug output for name propagation
+    console.debug("DropdownListBadge: _render called");
+    console.debug("DropdownListBadge: this._config =", this._config);
+    console.debug("DropdownListBadge: this._config.name =", this._config.name);
+
     const current = state.state;
     const options = this._config.options;
     const name = this._config.name || "";
