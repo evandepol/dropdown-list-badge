@@ -152,15 +152,16 @@ class DropdownListBadge extends HTMLElement {
           position: relative;
         }
         .dropdown-badge {
-          display: inline-flex;
+          display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
           height: 36px;
-          min-width: 40px;
+          min-width: 48px;
           font-size: 12px;
           font-weight: 500;
-          line-height: 28px;
-          padding: 0 16px;
+          line-height: 16px;
+          padding: 4px 10px;
           border-radius: 4px;
           border: 2px solid var(--primary-color, #2196f3);
           background: var(--ha-card-background, #fff);
@@ -169,14 +170,48 @@ class DropdownListBadge extends HTMLElement {
           cursor: pointer;
           user-select: none;
           transition: box-shadow 0.2s, border-color 0.2s;
+          position: relative;
         }
         .dropdown-badge.open, .dropdown-badge:focus {
           outline: none;
           border-color: var(--primary-color, #1976d2);
           box-shadow: 0 0 0 2px var(--primary-color, #1976d2, 0.2);
         }
+        .badge-content-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }
+        .badge-name-inside {
+          font-size: 11px;
+          color: var(--secondary-text-color, #888);
+          text-align: center;
+          font-weight: 400;
+          letter-spacing: 0.02em;
+          margin-bottom: 2px;
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .badge-icon {
+          margin-right: 6px;
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+          vertical-align: middle;
+          --mdc-icon-size: 18px;
+          color: var(--primary-color, #2196f3);
+          display: inline-block;
+        }
+        .dropdown-value {
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--primary-text-color, #212121);
+        }
         .dropdown-arrow {
-          margin-left: 10px;
+          margin-left: 8px;
           display: inline-block;
           transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           will-change: transform;
@@ -269,7 +304,6 @@ class DropdownListBadge extends HTMLElement {
         }
       </style>
       <div class="badge-wrapper">
-        ${name ? `<div class="badge-name">${name}</div>` : ""}
         <div
           class="dropdown-badge${this._dropdownOpen ? " open" : ""}"
           tabindex="0"
@@ -278,13 +312,16 @@ class DropdownListBadge extends HTMLElement {
           aria-haspopup="listbox"
           aria-expanded="${this._dropdownOpen ? "true" : "false"}"
         >
-          ${icon ? `<ha-icon class="badge-icon" icon="${icon}"></ha-icon>` : ""}
-          <span class="dropdown-value">${current}</span>
-          <span class="dropdown-arrow" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24">
-              <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </span>
+          ${name ? `<div class="badge-name-inside">${name}</div>` : ""}
+          <div class="badge-content-row">
+            ${icon ? `<ha-icon class="badge-icon" icon="${icon}"></ha-icon>` : ""}
+            <span class="dropdown-value">${current}</span>
+            <span class="dropdown-arrow" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
         </div>
         ${this._dropdownOpen ? `
           <div class="dropdown-list" role="listbox">
