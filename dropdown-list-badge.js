@@ -163,9 +163,9 @@ class DropdownListBadge extends HTMLElement {
           justify-content: center;
           min-height: 32px;
           height: auto;
-          font-size: 12px;
+          font-size: 11px;
           font-weight: 500;
-          line-height: 15px;
+          line-height: 11px;
           padding: 2px 8px; /* reduced vertical and horizontal padding */
           border-radius: 4px;
           border: 2px solid var(--primary-color, #2196f3);
