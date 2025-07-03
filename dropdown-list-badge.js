@@ -171,11 +171,10 @@ class DropdownListBadge extends HTMLElement {
         }
         .dropdown-arrow {
           margin-left: 10px;
-          font-size: 18px;
-          pointer-events: none;
-          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           display: inline-block;
+          transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
           will-change: transform;
+          vertical-align: middle;
         }
         .dropdown-badge.open .dropdown-arrow {
           transform: rotate(180deg);
@@ -215,17 +214,6 @@ class DropdownListBadge extends HTMLElement {
           margin: 0 4px;
           transition: background 0.15s, color 0.15s;
         }
-        .dropdown-option.selected,
-        .dropdown-option.highlighted,
-        .dropdown-option:hover {
-          background: var(--primary-color, #03a9f4);
-          color: var(--text-primary-color, #fff);
-        }
-        .dropdown-option.just-selected {
-          animation: flash-selected 0.2s;
-          background: var(--success-color, #4caf50) !important;
-          color: white !important;
-        }
         .dropdown-measure {
           position: absolute;
           visibility: hidden;
@@ -236,12 +224,23 @@ class DropdownListBadge extends HTMLElement {
           font-size: inherit;
           font-family: inherit;
           font-weight: inherit;
-          padding: 12px 24px;      /* Match .dropdown-option */
-          border-radius: 8px;      /* Match .dropdown-option */
-          box-sizing: border-box;  /* Match .dropdown-option */
+          padding: 12px 24px;
+          border-radius: 8px;
+          box-sizing: border-box;
+        }
+        .dropdown-option.selected,
+        .dropdown-option.highlighted,
+        .dropdown-option:hover {
+          background: var(--primary-color, #03a9f4);
+          color: var(--text-primary-color, #fff);
+        }
+        .dropdown-option.just-selected {
+          animation: flash-selected 0.2s;
+          background: var(--accent-color, #ff9800) !important;
+          color: white !important;
         }
         @keyframes flash-selected {
-          from { background: var(--success-color, #4caf50); }
+          from { background: var(--accent-color, #ff9800); }
           to { background: var(--primary-color, #03a9f4); }
         }
       </style>
@@ -255,7 +254,11 @@ class DropdownListBadge extends HTMLElement {
           aria-expanded="${this._dropdownOpen ? "true" : "false"}"
         >
           <span class="dropdown-value">${current}</span>
-          <span class="dropdown-arrow">▼</span>
+          <span class="dropdown-arrow" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <polyline points="6 9 12 15 18 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
         </div>
         ${this._dropdownOpen ? `
           <div class="dropdown-list" role="listbox">
