@@ -1,7 +1,7 @@
 class DropdownListBadge extends HTMLElement {
   // This is not documented in the main Home Assistant docs, but it is used 
   // internally by the Lovelace UI to filter and list custom badges.
-  static type = "badge";
+  static type = "custom:dropdown-list-badge";
 
   constructor() {
     super();
@@ -600,7 +600,7 @@ customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
 // register the custom card in Home Assistant so it shows up as a custom bade
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "dropdown-list-badge",
+  type: "custom:dropdown-list-badge",
   name: "Dropdown List Badge",
   description: "A badge with a dropdown for input_select entities."
 });
