@@ -4,8 +4,11 @@ A customizable Home Assistant Lovelace badge that displays the current value of 
 
 ## Screenshots
 
-<!-- Update the URLs below to match your repository's location and branch/tag as needed -->
+The "add badge" edit dialog:
 ![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
+
+
+The rendered result before clicking the arrow:
 ![Rendered badge with dropdown menu](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dropdown.png)
 
 ## Features
@@ -16,8 +19,8 @@ A customizable Home Assistant Lovelace badge that displays the current value of 
 - Optional `name` field to display a label above the badge.
 - Optional `icon` field to display a Home Assistant icon to the left of the value.
 - Animated dropdown arrow and flash effect using the Home Assistant accent color.
-- Fully integrated with the Lovelace "Custom badges" picker.
-- Responsive, accessible, and keyboard-navigable UI.
+- Fully integrated with the Lovelace "Custom badges" picker. TODO
+- Responsive, accessible, and keyboard-navigable UI with up, down, enter, and escape keys supported.
 - Preserves focus and caret position in the editor for smooth editing.
 - Compact layout: badge height is always at least 36px, and adapts to content.
 
