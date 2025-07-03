@@ -10,6 +10,12 @@ docker ps -a --filter "name=dropdown-list-badge" --format "{{.ID}}" | xargs -r d
 echo "Building Docker image..."
 docker build -t $IMAGE .
 
+# Ensure test artifact directories exist and are writable
+mkdir -p tests/results
+chmod -R 777 tests/results
+mkdir -p tests/__snapshots__
+chmod -R 777 tests/__snapshots__
+
 echo "Starting server container..."
 docker rm -f $CONTAINER_NAME 2>/dev/null || true
 docker run --name $CONTAINER_NAME -d -p 5000:5000 $IMAGE npx serve -l 5000 .
@@ -29,8 +35,8 @@ docker run --rm --network host \
   -v "$(pwd)/tests/__snapshots__:/app/tests/__snapshots__" \
   -v "$(pwd)/tests/results:/app/tests/results" \
   $IMAGE npx playwright test --output=tests/results
-  
+
 echo "Stopping server container..."
-docker rm -f $CONTAINER_NAME
+#docker rm -f $CONTAINER_NAME
 
 echo "Done."

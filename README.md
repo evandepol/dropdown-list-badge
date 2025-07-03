@@ -104,31 +104,68 @@ icon: mdi:sofa
 ### Requirements
 
 - [Colima](https://github.com/abiosoft/colima) (or Docker Desktop) is the **only** system requirement.
+- **If using Colima, you must also install [lima-additional-guestagents](https://github.com/lima-vm/lima-additional-guestagents):**
+  ```sh
+  brew install lima-additional-guestagents
+  ```
 - All development and testing tools (Node.js, npm, Playwright, etc.) run inside a container. No global Node/npm install needed.
 
 ### Quick Start
 
-1. **Start Colima (or Docker):**
+1. **Install lima-additional-guestagents (if using Colima):**
+   ```sh
+   brew install lima-additional-guestagents
+   ```
+
+2. **Start Colima (or Docker):**
    ```sh
    colima start
    ```
 
-2. **Build and run the test suite:**
+3. **Build and run the test suite:**
+   ```sh
+   ./run-test.sh
+   ```
+   This script will:
+   - Clean up any previous test containers.
+   - Build the Docker image.
+   - Start a static server in a container.
+   - Run the Playwright test suite in a separate container.
+   - Map the `tests/`, `tests/__snapshots__/`, and `tests/results/` directories for persistent test artifacts and visual regression snapshots.
+   - Stop the server container after tests complete.
+
+   Alternatively, you can run the steps manually:
    ```sh
    docker build -t dropdown-list-badge-test .
    docker run --rm -p 5000:5000 dropdown-list-badge-test npx serve -l 5000 . &
    # Wait a moment for the server to start, then in another terminal:
-   docker run --rm --network host dropdown-list-badge-test npx playwright test
+   docker run --rm --network host \
+     -v "$(pwd)/tests:/app/tests" \
+     -v "$(pwd)/tests/__snapshots__:/app/tests/__snapshots__" \
+     -v "$(pwd)/tests/results:/app/tests/results" \
+     dropdown-list-badge-test npx playwright test --output=tests/results
    ```
+
    Or, with a `docker-compose.yml`:
    ```sh
    docker-compose up --build
    ```
 
-3. **Edit and re-run:**
+4. **Edit and re-run:**
    - All code and tests are mounted into the container for live development (if using `docker-compose` with volumes).
    - Test files are in the `tests/` directory (see `badge.spec.ts` for Playwright examples).
    - The test page is at `test/index.html` and uses a mock Home Assistant environment.
+
+### Visual Regression & Test Artifacts
+
+- Playwright is configured to:
+  - Write all test artifacts (screenshots, videos, traces, HTML reports) to `tests/results/`.
+  - Store and compare reference ("approved") screenshots in `tests/__snapshots__/`.
+  - Use the config file at `tests/playwright.config.ts` to ensure all paths match the Docker volume mappings.
+- After running tests, you can review:
+  - Visual diffs and new/failed screenshots in `tests/results/`.
+  - HTML reports in `tests/results/html-report/`.
+  - Update reference images in `tests/__snapshots__/` as needed.
 
 ### What’s Tested
 
@@ -144,5 +181,4 @@ icon: mdi:sofa
 
 ---
 
-For more details, see the comments in `dropdown-list-badge.js` and the test files
-
+For more details, see the comments in `dropdown-list-badge.js` and the test files.

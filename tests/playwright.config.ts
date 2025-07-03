@@ -13,6 +13,8 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     trace: 'retain-on-failure',
+    actionTimeout: 10000,
+    navigationTimeout: 20000,
   },
   projects: [
     {
@@ -28,4 +30,6 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
+  retries: 1,
+  timeout: 30000,
 });

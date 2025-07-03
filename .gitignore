@@ -1,0 +1,17 @@
+# Playwright test artifacts
+tests/results/
+tests/**/*.png
+tests/**/*.webm
+tests/**/*.zip
+tests/**/*.trace
+tests/html-report/
+tests/results.html
+
+# Playwright snapshot diffs (but keep approved snapshots)
+tests/__snapshots__/*.png-diff.png
+tests/__snapshots__/*.png-fail.png
+tests/__snapshots__/*.png-actual.png
+
+# Optional: keep .gitkeep or .gitignore in empty dirs
+!tests/__snapshots__/.gitkeep
+!tests/results/.gitkeep
