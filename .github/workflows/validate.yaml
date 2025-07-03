@@ -1,0 +1,16 @@
+name: Validate HACS
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  hacs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: HACS validation
+        uses: hacs/action@main
+        with:
+          category: "plugin"
+
+
