@@ -161,8 +161,8 @@ class DropdownListBadge extends HTMLElement {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          height: 36px;
-          min-width: 48px;
+          min-height: 36px;
+          height: auto;
           font-size: 12px;
           font-weight: 500;
           line-height: 16px;
