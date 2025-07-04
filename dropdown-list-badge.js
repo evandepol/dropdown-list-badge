@@ -410,29 +410,55 @@ class DropdownListBadge extends HTMLElement {
     this.addEventListener("mousedown", this._handleMouseDown);
     this.addEventListener("mouseup", this._handleMouseUp);
     this.addEventListener("mouseleave", this._handleMouseLeave);
+    this.addEventListener("dblclick", this._handleDoubleClick);
   }
 
   disconnectedCallback() {
     this.removeEventListener("mousedown", this._handleMouseDown);
     this.removeEventListener("mouseup", this._handleMouseUp);
     this.removeEventListener("mouseleave", this._handleMouseLeave);
+    this.removeEventListener("dblclick", this._handleDoubleClick);
   }
 
-  _handleMouseDown() {
+  _handleMouseDown(e) {
+    // Start the long-press timer
     this._longPressTimer = setTimeout(() => {
       const defaultOption = this._config.default;
       if (defaultOption) {
         this._selectOption(defaultOption);
       }
+      this._longPressTimer = null; // Clear the timer after execution
     }, 500); // 500ms for long-press
+
+    // Open the dropdown immediately for short press
+    if (!this._dropdownOpen) {
+      this._openDropdown();
+    }
   }
 
   _handleMouseUp() {
-    clearTimeout(this._longPressTimer);
+    // Clear the long-press timer if the mouse is released early
+    if (this._longPressTimer) {
+      clearTimeout(this._longPressTimer);
+      this._longPressTimer = null;
+    }
   }
 
   _handleMouseLeave() {
-    clearTimeout(this._longPressTimer);
+    // Clear the long-press timer if the mouse leaves the badge
+    if (this._longPressTimer) {
+      clearTimeout(this._longPressTimer);
+      this._longPressTimer = null;
+    }
+  }
+
+  _handleDoubleClick() {
+    // Double-click should toggle the dropdown without selecting the default
+    if (this._dropdownOpen) {
+      this._closeDropdown();
+    } else {
+      this._openDropdown();
+    }
   }
 }
 
