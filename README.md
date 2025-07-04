@@ -47,9 +47,11 @@ icon: mdi:star         # (optional) Home Assistant icon to show left of value
 | options  | Yes      | List of options to display in the dropdown. Auto-populated from the entity. |
 | name     | No       | Optional label shown above the badge.                                       |
 | icon     | No       | Optional icon (e.g., `mdi:star`) shown to the left of the value.            |
+| default  | No       | Option to select when the badge is double-clicked.                          |
 
 - The `options` list is auto-filled from the selected entity in the editor. You can include/exclude options using checkboxes.
 - The `name` and `icon` fields are optional and can be left blank.
+- The `default` option, if set, will be selected when the badge is double-clicked.
 
 ## Advanced Usage
 
@@ -90,6 +92,7 @@ options:
   - Party
 name: Living Room Mode
 icon: mdi:sofa
+default: Movie
 ```
 
 ## Changelog

@@ -29,12 +29,21 @@ for i in {1..20}; do
   sleep 1
 done
 
+set +e
+
 echo "Running Playwright tests..."
 docker run --rm --network host \
   -v "$(pwd)/tests:/app/tests" \
   -v "$(pwd)/tests/__snapshots__:/app/tests/__snapshots__" \
   -v "$(pwd)/tests/results:/app/tests/results" \
   $IMAGE npx playwright test --output=tests/results
+
+echo "Generating Playwright HTML report..."
+docker run --rm --network host \
+  -v "$(pwd)/tests:/app/tests" \
+  -v "$(pwd)/tests/__snapshots__:/app/tests/__snapshots__" \
+  -v "$(pwd)/tests/results:/app/tests/results" \
+  $IMAGE npx playwright show-report tests/results/html-report --quiet
 
 echo "Stopping server container..."
 #docker rm -f $CONTAINER_NAME

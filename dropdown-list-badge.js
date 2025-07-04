@@ -138,15 +138,11 @@ class DropdownListBadge extends HTMLElement {
       return;
     }
 
-    // Debug output for name propagation
-    // console.debug("DropdownListBadge: _render called");
-    // console.debug("DropdownListBadge: this._config =", this._config);
-    // console.debug("DropdownListBadge: this._config.name =", this._config.name);
-
     const current = state.state;
     const options = this._config.options;
     const name = this._config.name || "";
     const icon = this._config.icon || "";
+    const defaultOption = this._config.default;
 
     this.innerHTML = `
       <style>
@@ -334,14 +330,15 @@ class DropdownListBadge extends HTMLElement {
             ${options.map((opt, i) => {
               const selectedClass = (!this._dropdownOpen && opt === current) ? ' selected' : '';
               const highlightedClass = (i === this._highlightedIndex) ? ' highlighted' : '';
+              const defaultClass = (opt === defaultOption) ? ' default-option' : '';
               return `
                 <div
-                  class="dropdown-option${selectedClass}${highlightedClass}"
+                  class="dropdown-option${selectedClass}${highlightedClass}${defaultClass}"
                   data-value="${opt}"
                   tabindex="0"
                   role="option"
                   aria-selected="${opt === current ? "true" : "false"}"
-                >${opt}</div>
+                >${opt}${opt === defaultOption ? ' <span style="color:#888;font-size:10px;">(default)</span>' : ''}</div>
               `;
             }).join('')}
           </div>
@@ -360,6 +357,11 @@ class DropdownListBadge extends HTMLElement {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           this._openDropdown();
+        }
+      };
+      badge.ondblclick = () => {
+        if (defaultOption && options.includes(defaultOption)) {
+          this._selectOption(defaultOption);
         }
       };
     }
@@ -569,6 +571,16 @@ class DropdownListBadgeEditor extends HTMLElement {
           <label for="badge-icon">Icon (optional, e.g. mdi:star)</label>
           <input id="badge-icon" type="text" value="${icon}" placeholder="mdi:star" />
         </div>
+        <div>
+          <label for="badge-default">Default option (double-click badge to select)</label>
+          <select id="badge-default">
+            <option value="">(none)</option>
+            ${possibleOptions.map(opt => `
+              <option value="${opt}" ${opt === this._config.default ? "selected" : ""}>${opt}</option>
+            `).join("")}
+          </select>
+          <div class="hint">This option will be selected when the badge is double-clicked.</div>
+        </div>
         <div class="options-list">
           <label>Options:</label>
           ${possibleOptions.length === 0
@@ -631,6 +643,13 @@ class DropdownListBadgeEditor extends HTMLElement {
     if (iconInput) {
       iconInput.oninput = (e) => {
         this._config.icon = e.target.value;
+        this._emitConfigChanged();
+      };
+    }
+    const defaultSelect = this.shadowRoot.getElementById("badge-default");
+    if (defaultSelect) {
+      defaultSelect.onchange = (e) => {
+        this._config.default = e.target.value || undefined;
         this._emitConfigChanged();
       };
     }
