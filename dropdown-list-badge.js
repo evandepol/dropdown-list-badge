@@ -7,12 +7,8 @@ class DropdownListBadge extends HTMLElement {
     super();
     this._dropdownOpen = false;
     this._highlightedIndex = -1;
-    this._longPressTimer = null; // Timer for long-press detection
     this._handleOutsideClick = this._handleOutsideClick.bind(this);
     this._handleKeyDown = this._handleKeyDown.bind(this);
-    this._handleMouseDown = this._handleMouseDown.bind(this);
-    this._handleMouseUp = this._handleMouseUp.bind(this);
-    this._handleMouseLeave = this._handleMouseLeave.bind(this);
   }
 
   setConfig(config) {
@@ -356,44 +352,15 @@ class DropdownListBadge extends HTMLElement {
     // Attach event handler to the custom badge
     const badge = this.querySelector(".dropdown-badge");
     if (badge) {
-      // Remove all previous handlers to avoid duplicates
       badge.onclick = null;
-      badge.onmousedown = null;
-      badge.onmouseup = null;
-      badge.onmouseleave = null;
-      badge.ondblclick = null;
-
-      // Short press: open menu
       badge.onclick = (e) => {
-        // Only open if not already open
         if (!this._dropdownOpen) {
           this._openDropdown();
         }
       };
-
-      // Long press: select default
-      badge.onmousedown = (e) => {
-        this._longPressTimer = setTimeout(() => {
-          const defaultOption = this._config.default;
-          if (defaultOption) {
-            this._selectOption(defaultOption);
-          }
-          this._longPressTimer = null;
-        }, 500);
-      };
-      badge.onmouseup = badge.onmouseleave = (e) => {
-        if (this._longPressTimer) {
-          clearTimeout(this._longPressTimer);
-          this._longPressTimer = null;
-        }
-      };
-
-      // Double click: toggle menu, do NOT select default
-      badge.ondblclick = (e) => {
-        e.preventDefault();
-        if (this._dropdownOpen) {
-          this._closeDropdown();
-        } else {
+      badge.onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
           this._openDropdown();
         }
       };
@@ -432,60 +399,6 @@ class DropdownListBadge extends HTMLElement {
 
   getCardSize() {
     return 1;
-  }
-
-  // Add event listeners for long-press detection
-  connectedCallback() {
-    // Attach only to the badge, not the whole component!
-    // So, do not use this.addEventListener here.
-  }
-
-  disconnectedCallback() {
-    this.removeEventListener("mousedown", this._handleMouseDown);
-    this.removeEventListener("mouseup", this._handleMouseUp);
-    this.removeEventListener("mouseleave", this._handleMouseLeave);
-    this.removeEventListener("dblclick", this._handleDoubleClick);
-  }
-
-  _handleMouseDown(e) {
-    // Start the long-press timer
-    this._longPressTimer = setTimeout(() => {
-      const defaultOption = this._config.default;
-      if (defaultOption) {
-        this._selectOption(defaultOption);
-      }
-      this._longPressTimer = null; // Clear the timer after execution
-    }, 500); // 500ms for long-press
-
-    // Open the dropdown immediately for short press
-    if (!this._dropdownOpen) {
-      this._openDropdown();
-    }
-  }
-
-  _handleMouseUp() {
-    // Clear the long-press timer if the mouse is released early
-    if (this._longPressTimer) {
-      clearTimeout(this._longPressTimer);
-      this._longPressTimer = null;
-    }
-  }
-
-  _handleMouseLeave() {
-    // Clear the long-press timer if the mouse leaves the badge
-    if (this._longPressTimer) {
-      clearTimeout(this._longPressTimer);
-      this._longPressTimer = null;
-    }
-  }
-
-  _handleDoubleClick() {
-    // Double-click should toggle the dropdown without selecting the default
-    if (this._dropdownOpen) {
-      this._closeDropdown();
-    } else {
-      this._openDropdown();
-    }
   }
 }
 
@@ -658,16 +571,6 @@ class DropdownListBadgeEditor extends HTMLElement {
           <label for="badge-icon">Icon (optional, e.g. mdi:star)</label>
           <input id="badge-icon" type="text" value="${icon}" placeholder="mdi:star" />
         </div>
-        <div>
-          <label for="badge-default">Default option (double-click badge to select)</label>
-          <select id="badge-default">
-            <option value="">(none)</option>
-            ${possibleOptions.map(opt => `
-              <option value="${opt}" ${opt === this._config.default ? "selected" : ""}>${opt}</option>
-            `).join("")}
-          </select>
-          <div class="hint">This option will be selected when the badge is double-clicked.</div>
-        </div>
         <div class="options-list">
           <label>Options:</label>
           ${possibleOptions.length === 0
@@ -730,13 +633,6 @@ class DropdownListBadgeEditor extends HTMLElement {
     if (iconInput) {
       iconInput.oninput = (e) => {
         this._config.icon = e.target.value;
-        this._emitConfigChanged();
-      };
-    }
-    const defaultSelect = this.shadowRoot.getElementById("badge-default");
-    if (defaultSelect) {
-      defaultSelect.onchange = (e) => {
-        this._config.default = e.target.value || undefined;
         this._emitConfigChanged();
       };
     }

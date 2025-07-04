@@ -15,3 +15,6 @@ tests/__snapshots__/*.png-actual.png
 # Optional: keep .gitkeep or .gitignore in empty dirs
 !tests/__snapshots__/.gitkeep
 !tests/results/.gitkeep
+
+# Node
+node_modules/

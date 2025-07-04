@@ -64,27 +64,3 @@ test('visual regression: dropdown open', async ({ page }) => {
   await page.screenshot({ path: 'tests/results/badge-dropdown-open.png' });
   expect(await page.screenshot()).toMatchSnapshot('badge-dropdown-open.png');
 });
-
-test('double-click selects default option', async ({ page }) => {
-  // Set default to "Option 3" via config (simulate editor)
-  await page.evaluate(() => {
-    const badge = document.getElementById('badge');
-    badge.setConfig({
-      entity: 'input_select.test',
-      options: ['Option 1', 'Option 2', 'Option 3'],
-      name: 'Test Badge',
-      default: 'Option 3'
-    });
-    badge.hass = {
-      states: {
-        'input_select.test': {
-          state: 'Option 1',
-          attributes: { options: ['Option 1', 'Option 2', 'Option 3'] }
-        }
-      }
-    };
-  });
-  // Double-click the badge
-  await page.dblclick('#badge .dropdown-badge');
-  await expect(page.locator('#badge .dropdown-value')).toHaveText('Option 3');
-});
