@@ -356,16 +356,45 @@ class DropdownListBadge extends HTMLElement {
     // Attach event handler to the custom badge
     const badge = this.querySelector(".dropdown-badge");
     if (badge) {
-      badge.onclick = () => this._openDropdown();
-      badge.onkeydown = (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
+      // Remove all previous handlers to avoid duplicates
+      badge.onclick = null;
+      badge.onmousedown = null;
+      badge.onmouseup = null;
+      badge.onmouseleave = null;
+      badge.ondblclick = null;
+
+      // Short press: open menu
+      badge.onclick = (e) => {
+        // Only open if not already open
+        if (!this._dropdownOpen) {
           this._openDropdown();
         }
       };
-      badge.ondblclick = () => {
-        if (defaultOption && options.includes(defaultOption)) {
-          this._selectOption(defaultOption);
+
+      // Long press: select default
+      badge.onmousedown = (e) => {
+        this._longPressTimer = setTimeout(() => {
+          const defaultOption = this._config.default;
+          if (defaultOption) {
+            this._selectOption(defaultOption);
+          }
+          this._longPressTimer = null;
+        }, 500);
+      };
+      badge.onmouseup = badge.onmouseleave = (e) => {
+        if (this._longPressTimer) {
+          clearTimeout(this._longPressTimer);
+          this._longPressTimer = null;
+        }
+      };
+
+      // Double click: toggle menu, do NOT select default
+      badge.ondblclick = (e) => {
+        e.preventDefault();
+        if (this._dropdownOpen) {
+          this._closeDropdown();
+        } else {
+          this._openDropdown();
         }
       };
     }
@@ -407,10 +436,8 @@ class DropdownListBadge extends HTMLElement {
 
   // Add event listeners for long-press detection
   connectedCallback() {
-    this.addEventListener("mousedown", this._handleMouseDown);
-    this.addEventListener("mouseup", this._handleMouseUp);
-    this.addEventListener("mouseleave", this._handleMouseLeave);
-    this.addEventListener("dblclick", this._handleDoubleClick);
+    // Attach only to the badge, not the whole component!
+    // So, do not use this.addEventListener here.
   }
 
   disconnectedCallback() {
