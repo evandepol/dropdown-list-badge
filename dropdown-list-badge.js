@@ -7,8 +7,12 @@ class DropdownListBadge extends HTMLElement {
     super();
     this._dropdownOpen = false;
     this._highlightedIndex = -1;
+    this._longPressTimer = null; // Timer for long-press detection
     this._handleOutsideClick = this._handleOutsideClick.bind(this);
     this._handleKeyDown = this._handleKeyDown.bind(this);
+    this._handleMouseDown = this._handleMouseDown.bind(this);
+    this._handleMouseUp = this._handleMouseUp.bind(this);
+    this._handleMouseLeave = this._handleMouseLeave.bind(this);
   }
 
   setConfig(config) {
@@ -399,6 +403,36 @@ class DropdownListBadge extends HTMLElement {
 
   getCardSize() {
     return 1;
+  }
+
+  // Add event listeners for long-press detection
+  connectedCallback() {
+    this.addEventListener("mousedown", this._handleMouseDown);
+    this.addEventListener("mouseup", this._handleMouseUp);
+    this.addEventListener("mouseleave", this._handleMouseLeave);
+  }
+
+  disconnectedCallback() {
+    this.removeEventListener("mousedown", this._handleMouseDown);
+    this.removeEventListener("mouseup", this._handleMouseUp);
+    this.removeEventListener("mouseleave", this._handleMouseLeave);
+  }
+
+  _handleMouseDown() {
+    this._longPressTimer = setTimeout(() => {
+      const defaultOption = this._config.default;
+      if (defaultOption) {
+        this._selectOption(defaultOption);
+      }
+    }, 500); // 500ms for long-press
+  }
+
+  _handleMouseUp() {
+    clearTimeout(this._longPressTimer);
+  }
+
+  _handleMouseLeave() {
+    clearTimeout(this._longPressTimer);
   }
 }
 
