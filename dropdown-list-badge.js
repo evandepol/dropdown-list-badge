@@ -142,7 +142,6 @@ class DropdownListBadge extends HTMLElement {
     const options = this._config.options;
     const name = this._config.name || "";
     const icon = this._config.icon || "";
-    const defaultOption = this._config.default;
 
     this.innerHTML = `
       <style>
@@ -173,10 +172,8 @@ class DropdownListBadge extends HTMLElement {
           transition: box-shadow 0.2s, border-color 0.2s;
           position: relative;
         }
-        .dropdown-badge.open, .dropdown-badge:focus {
+        .dropdown-badge:focus {
           outline: none;
-          border-color: var(--primary-color, #1976d2);
-          box-shadow: 0 0 0 2px var(--primary-color, #1976d2, 0.2);
         }
         .badge-content-row {
           display: flex;
@@ -330,15 +327,14 @@ class DropdownListBadge extends HTMLElement {
             ${options.map((opt, i) => {
               const selectedClass = (!this._dropdownOpen && opt === current) ? ' selected' : '';
               const highlightedClass = (i === this._highlightedIndex) ? ' highlighted' : '';
-              const defaultClass = (opt === defaultOption) ? ' default-option' : '';
               return `
                 <div
-                  class="dropdown-option${selectedClass}${highlightedClass}${defaultClass}"
+                  class="dropdown-option${selectedClass}${highlightedClass}"
                   data-value="${opt}"
                   tabindex="0"
                   role="option"
                   aria-selected="${opt === current ? "true" : "false"}"
-                >${opt}${opt === defaultOption ? ' <span style="color:#888;font-size:10px;">(default)</span>' : ''}</div>
+                >${opt}</div>
               `;
             }).join('')}
           </div>
