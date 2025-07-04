@@ -58,9 +58,6 @@ class DropdownListBadge extends HTMLElement {
   }
 
   _handleOutsideClick(e) {
-    // Debug: log the selected option to the browser console
-    //console.debug("DropdownListBadge: _handleOutsideClick");
-
     // Only close if the click is truly outside the dropdown
     if (!this.contains(e.target)) {
       this._closeDropdown();
@@ -98,9 +95,6 @@ class DropdownListBadge extends HTMLElement {
   }
 
   _selectOption(opt) {
-    // Debug: log the selected option to the browser console
-    //console.debug("DropdownListBadge: Selected option", opt);
-
     // Visual feedback: flash the selected option
     const options = this._config.options;
     const idx = options.indexOf(opt);
@@ -584,8 +578,6 @@ class DropdownListBadgeEditor extends HTMLElement {
     // Attach event listeners
     const entityInput = this.shadowRoot.getElementById("entity");
     entityInput.oninput = this._onEntityChanged.bind(this);
-    // entityInput.onfocus = () => console.log("DropdownListBadgeEditor: entity input focused");
-    // entityInput.onblur = () => console.log("DropdownListBadgeEditor: entity input blurred");
     entityInput.onkeydown = (e) => {
       if (e.key === "Tab") {
         const val = entityInput.value.trim().toLowerCase();
