@@ -49,10 +49,12 @@ class DropdownListBadge extends HTMLElement {
     }, 0);
   }
 
+  // Close the open dropdown: reset highlight, rerender, and remove global listeners
   _closeDropdown() {
     this._dropdownOpen = false;
     this._highlightedIndex = -1;
     this._render();
+
     document.removeEventListener("mousedown", this._handleOutsideClick);
     document.removeEventListener("keydown", this._handleKeyDown);
   }
@@ -64,24 +66,44 @@ class DropdownListBadge extends HTMLElement {
     }
   }
 
+  // Handle keyboard navigation when dropdown is open
   _handleKeyDown(e) {
     if (!this._dropdownOpen) return;
+
     const options = this._config.options;
-    if (e.key === "Escape") {
-      this._closeDropdown();
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      this._highlightedIndex = (this._highlightedIndex + 1) % options.length;
-      this._updateHighlight();
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      this._highlightedIndex = (this._highlightedIndex - 1 + options.length) % options.length;
-      this._updateHighlight();
-    } else if (e.key === "Enter") {
-      e.preventDefault();
-      if (this._highlightedIndex >= 0 && this._highlightedIndex < options.length) {
-        this._selectOption(options[this._highlightedIndex]);
-      }
+
+    switch (e.key) {
+      case "Escape":
+        // Close on Escape
+        this._closeDropdown();
+        break;
+
+      case "ArrowDown":
+        e.preventDefault();
+        // Move highlight down, wrapping around
+        this._highlightedIndex = (this._highlightedIndex + 1) % options.length;
+        this._updateHighlight();
+        break;
+
+      case "ArrowUp":
+        e.preventDefault();
+        // Move highlight up, wrapping around
+        this._highlightedIndex =
+          (this._highlightedIndex - 1 + options.length) % options.length;
+        this._updateHighlight();
+        break;
+
+      case "Enter":
+        // Select the currently highlighted option
+        if (
+          this._highlightedIndex >= 0 &&
+          this._highlightedIndex < options.length
+        ) {
+          this._selectOption(options[this._highlightedIndex]);
+        }
+        break;
+
+      // Other keys are ignored
     }
   }
 
