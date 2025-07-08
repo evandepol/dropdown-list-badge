@@ -1,7 +1,5 @@
 # Dropdown List Badge
 
-A customizable Home Assistant Lovelace badge that displays the current value of an `input_select` (or similar entity) and allows users to quickly change its value from a dropdown menu. This badge is designed for a modern, accessible, and visually appealing experience, with advanced configuration and integration options.
-
 [![Validate HACS](https://github.com/evandepol/dropdown-list-badge/actions/workflows/validate.yaml/badge.svg)](https://github.com/evandepol/dropdown-list-badge/actions/workflows/validate.yaml)
 ![Latest Release](https://img.shields.io/github/v/release/evandepol/dropdown-list-badge)
 ![License](https://img.shields.io/github/license/evandepol/dropdown-list-badge)
@@ -10,14 +8,17 @@ A customizable Home Assistant Lovelace badge that displays the current value of 
 ![Pull Requests](https://img.shields.io/github/issues-pr/evandepol/dropdown-list-badge)
 ![Stars](https://img.shields.io/github/stars/evandepol/dropdown-list-badge?style=social)
 
+A customizable Home Assistant Lovelace badge that displays the current value of an `input_select` (or similar entity) and allows users to quickly change its value from a dropdown menu. This badge is designed for a modern, accessible, and visually appealing experience, with advanced configuration and integration options.
+
+
 ## Screenshots
-
-The "add badge" edit dialog:
-![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
-
 
 The rendered result before clicking the arrow:
 ![Rendered badge with dropdown menu](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dropdown.png)
+
+The badge editor dialog:
+![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
+
 
 ## Features
 
