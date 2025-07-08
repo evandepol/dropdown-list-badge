@@ -3,12 +3,8 @@
 A customizable Home Assistant Lovelace badge that displays the current value of an `input_select` (or similar entity) and allows users to quickly change its value from a dropdown menu. This badge is designed for a modern, accessible, and visually appealing experience, with advanced configuration and integration options.
 
 [![Validate HACS](https://github.com/evandepol/dropdown-list-badge/actions/workflows/validate.yaml/badge.svg)](https://github.com/evandepol/dropdown-list-badge/actions/workflows/validate.yaml)
-[![GitHub Release](https://img.shields.io/github/release/tterb/PlayMusic.svg?style=flat)]()  
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/erikvandepol/dropdown-list-badge)
 
-
-## Downloads
-#### GitHub (All Releases)
-[![Github All Releases](https://img.shields.io/github/downloads/atom/atom/total.svg?style=flat)]()  
 ## Screenshots
 
 The "add badge" edit dialog:
