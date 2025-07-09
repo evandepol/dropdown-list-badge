@@ -10,15 +10,14 @@
 
 A customizable Home Assistant Lovelace badge that displays the current value of an `input_select` (or similar entity) and allows users to quickly change its value from a dropdown menu. This badge is designed for a modern, accessible, and visually appealing experience, with advanced configuration and integration options.
 
-
 ## Screenshots
+
+The "add badge" edit dialog:
+![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
+
 
 The rendered result before clicking the arrow:
 ![Rendered badge with dropdown menu](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dropdown.png)
-
-The badge editor dialog:
-![Add badge dialog Screenshot](https://raw.githubusercontent.com/evandepol/dropdown-list-badge/main/dialog.png)
-
 
 ## Features
 
@@ -56,11 +55,10 @@ icon: mdi:star         # (optional) Home Assistant icon to show left of value
 | options  | Yes      | List of options to display in the dropdown. Auto-populated from the entity. |
 | name     | No       | Optional label shown above the badge.                                       |
 | icon     | No       | Optional icon (e.g., `mdi:star`) shown to the left of the value.            |
-| default  | No       | Option to select when the badge is double-clicked.                          |
+
 
 - The `options` list is auto-filled from the selected entity in the editor. You can include/exclude options using checkboxes.
 - The `name` and `icon` fields are optional and can be left blank.
-- The `default` option, if set, will be selected when the badge is double-clicked.
 
 ## Advanced Usage
 
@@ -101,7 +99,6 @@ options:
   - Party
 name: Living Room Mode
 icon: mdi:sofa
-default: Movie
 ```
 
 ## Changelog
@@ -168,6 +165,45 @@ default: Movie
    - Test files are in the `tests/` directory (see `badge.spec.ts` for Playwright examples).
    - The test page is at `test/index.html` and uses a mock Home Assistant environment.
 
+### Testing & Visual Regression
+
+### Running Tests
+
+To run all Playwright tests in Docker:
+
+```sh
+./run-test.sh
+```
+
+#### Options
+
+- `--update-snapshots`  
+  Update Playwright visual regression snapshots (use this if you intentionally changed the UI and want to update the reference images).
+
+- `--help` or `-h`  
+  Show usage information.
+
+**Example:**
+```sh
+./run-test.sh --update-snapshots
+```
+
+### Viewing the Playwright HTML Report
+
+After running tests, a static HTML report is generated in `tests/html-report`.
+
+To view the report locally, use the provided script:
+
+```sh
+./show-report.sh
+```
+
+This will serve the HTML report and open it in your browser.
+
+---
+
+For more details, see the comments in `run-test.sh` and `show-report.sh`.
+
 ### Visual Regression & Test Artifacts
 
 - Playwright is configured to:
@@ -194,3 +230,90 @@ default: Movie
 ---
 
 For more details, see the comments in `dropdown-list-badge.js` and the test files.
+
+## User-Specific UI: Selectively Show/Hide Parts of the Dashboard
+
+You can use the `custom:dropdown-list-badge` to let each user control their own UI view (e.g., which area or floor is focused), and use Home Assistant’s `user` and `state` conditions to show or hide cards, stacks, or badges based on the user and their selection. This keeps the setting user-specific and persistent for each user.
+
+### Example: User-Specific Focus Badge and Conditional Visibility
+
+```yaml
+badges:
+  # ...other badges...
+  - type: custom:dropdown-list-badge
+    entity: input_select.area_focus_erik
+    options:
+      - All
+      - Outside
+      - Basement
+      - First floor
+      - Second floor
+      - Third floor
+    name: Focus
+    icon: mdi:eye
+    visibility:
+      - condition: user
+        users:
+          - ebfe3ab3b2154b87897ce9d5df9ebf08  # Erik's user ID
+  - type: custom:dropdown-list-badge
+    entity: input_select.area_focus_wilma
+    options:
+      - All
+      - Outside
+      - Basement
+      - First floor
+      - Second floor
+      - Third floor
+    name: Focus
+    icon: mdi:eye
+    visibility:
+      - condition: user
+        users:
+          - 2c6f8477a7e54f2497e6a7f7a7e6a7f7  # Wilma's user ID
+```
+
+### How to Add a User-Specific `input_select` Helper
+
+To enable each user to have their own dropdown selection, you need to create a separate `input_select` helper for each user. This keeps each user’s selection independent and persistent.
+
+#### Steps:
+
+1. **Go to Home Assistant Settings → Devices & Services → Helpers.**
+2. **Click “+ Add Helper” and choose “Dropdown” (or “Input Select”).**
+3. **Name the helper something user-specific, e.g., `area_focus_erik` or `area_focus_wilma`.**
+4. **Add the options you want each user to be able to select (e.g., All, Basement, First floor, etc.).**
+5. **Repeat for each user, creating a unique helper for each.**
+
+#### Example YAML for a Helper
+
+You can also define the helper in `configuration.yaml` (advanced users):
+
+```yaml
+input_select:
+  area_focus_erik:
+    name: Area Focus Erik
+    options:
+      - All
+      - Outside
+      - Basement
+      - First floor
+      - Second floor
+      - Third floor
+    initial: All
+  area_focus_wilma:
+    name: Area Focus Wilma
+    options:
+      - All
+      - Outside
+      - Basement
+      - First floor
+      - Second floor
+      - Third floor
+    initial: All
+```
+
+> **Tip:**  
+> Use the UI to create helpers for easier management and to avoid YAML errors.  
+> The entity IDs will be `input_select.area_focus_erik`, `input_select.area_focus_wilma`, etc.
+
+Once created, use these entity IDs in your `custom:dropdown-list-badge` configuration as shown above. Each user will see and control only their own dropdown, and you can use the state of these helpers for conditional UI

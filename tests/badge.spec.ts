@@ -1,5 +1,10 @@
 import { test, expect } from '@playwright/test';
 
+declare global {
+  interface Window {
+    hassStub: any; // Replace 'any' with a more specific type if you have one
+  }
+}
 
 test.beforeEach(async ({ page }) => {
   page.on('console', msg => console.log('PAGE LOG:', msg.text()));
@@ -20,12 +25,12 @@ test.beforeEach(async ({ page }) => {
         if (domain === "input_select" && service === "select_option") {
           this.states[data.entity_id].state = data.option;
           document.querySelectorAll('dropdown-list-badge').forEach(badge => {
-            badge.hass = this;  // triggers the setter and re-renders
+            (badge as DropdownListBadge).hass = this;  // triggers the setter and re-renders
           });
         }
       }
     };
-    const badge = document.querySelector('dropdown-list-badge');
+    const badge = document.querySelector('dropdown-list-badge') as DropdownListBadge;
     badge.hass = window.hassStub;
     badge.setConfig({
       entity: "input_select.test",
