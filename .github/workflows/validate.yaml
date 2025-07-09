@@ -4,12 +4,40 @@ on:
   push:
     branches: [main]
   pull_request:
+    branches: [ main ]
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
 permissions: {}  
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Build Docker image
+        run: docker build -t dropdown-list-badge-test .
+      - name: Start server
+        run: |
+          docker run --name dropdown-list-badge-server -d -p 5000:5000 dropdown-list-badge-test npx serve -l 5000 .
+          sleep 5
+      - name: Run Playwright tests
+        run: |
+          docker run --rm --network host \
+            -v ${{ github.workspace }}/tests:/app/tests \
+            -v ${{ github.workspace }}/tests/__snapshots__:/app/tests/__snapshots__ \
+            -v ${{ github.workspace }}/tests/test-results:/app/tests/test-results \
+            -v ${{ github.workspace }}/tests/html-report:/app/tests/html-report \
+            dropdown-list-badge-test npx playwright test --config=tests/playwright.config.ts
+      - name: Upload Playwright HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report
+          path: tests/html-report
+      - name: Stop server
+        run: docker rm -f dropdown-list-badge-server || true
   validate-hacs:
     runs-on: ubuntu-latest
     steps:
