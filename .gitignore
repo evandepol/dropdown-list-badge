@@ -1,11 +1,10 @@
 # Playwright test artifacts
-tests/results/
-tests/**/*.png
-tests/**/*.webm
-tests/**/*.zip
-tests/**/*.trace
+tests/test-results/
 tests/html-report/
-tests/results.html
+tests/results/
+
+.DS_Store
+.last-run.json
 
 # Playwright snapshot diffs (but keep approved snapshots)
 tests/__snapshots__/*.png-diff.png

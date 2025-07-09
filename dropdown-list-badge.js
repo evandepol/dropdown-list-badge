@@ -361,6 +361,7 @@ class DropdownListBadge extends HTMLElement {
       </div>
     `;
 
+    
     // Attach event handler to the custom badge
     const badge = this.querySelector(".dropdown-badge");
     if (badge) {

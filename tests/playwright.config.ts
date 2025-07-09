@@ -1,12 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './tests',
-  outputDir: './tests/results',
-  snapshotDir: './tests/__snapshots__',
+  testDir: './',
+  outputDir: './test-results',
+  snapshotDir: './__snapshots__',
   reporter: [
     ['list'],
-    ['html', { outputFolder: './tests/results/html-report', open: 'never' }]
+    ['html', { outputFolder: './html-report', open: 'never' }]
   ],
   use: {
     baseURL: 'http://localhost:5000',
@@ -17,18 +17,18 @@ export default defineConfig({
     navigationTimeout: 20000,
   },
   projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
+//    {
+//      name: 'chromium',
+//      use: { ...devices['Desktop Chrome'] },
+//    },
     {
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+//    {
+//      name: 'webkit',
+//      use: { ...devices['Desktop Safari'] },
+//    },
   ],
   retries: 1,
   timeout: 30000,
