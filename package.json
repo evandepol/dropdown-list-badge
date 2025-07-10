@@ -3,6 +3,7 @@
   "private": true,
   "devDependencies": {
     "@playwright/test": "^1.53.2",
+    "@types/node": "^24.0.12",
     "serve": "^14.2.0",
     "typescript": "^5.8.3"
   },

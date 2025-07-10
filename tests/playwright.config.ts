@@ -1,19 +1,22 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices, type ReporterDescription } from '@playwright/test';
 
 /**
  * Conditionally set reporters based on the environment.
  * In CI, use the 'github' reporter for integrated annotations.
  * Locally, use the 'list' reporter for immediate feedback in the console.
  */
-const reporters = [
-  ['html', { outputFolder: './html-report', open: 'never' }]
+// Initialize reporters as a flat array of the correct type.
+const reporters: ReporterDescription[] = [
+  // Default reporter for all environments
+  ['html', { outputFolder: 'html-report', open: 'never' }]
 ];
 
 if (process.env.CI) {
+  // In CI, push the 'github' string and the 'json' tuple directly.
   reporters.push(['github']);
-  // Optionally, add a JSON report for CI analysis
   reporters.push(['json', { outputFile: 'test-results.json' }]);
 } else {
+  // Locally, push the 'list' string directly.
   reporters.push(['list']);
 }
 
