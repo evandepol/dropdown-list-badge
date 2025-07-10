@@ -1,4 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { DropdownListBadge, DropdownListBadgeEditor } from '../dropdown-list-badge';
+
+interface CallServiceData {
+  entity_id: string;
+  option: string;
+}
 
 declare global {
   interface Window {
@@ -21,11 +27,11 @@ test.beforeEach(async ({ page }) => {
           }
         }
       },
-      callService(domain, service, data) {
+      callService(domain: string, service: string, data: CallServiceData): void {
         if (domain === "input_select" && service === "select_option") {
           this.states[data.entity_id].state = data.option;
           document.querySelectorAll('dropdown-list-badge').forEach(badge => {
-            (badge as DropdownListBadge).hass = this;  // triggers the setter and re-renders
+        (badge as DropdownListBadge).hass = this;  // triggers the setter and re-renders
           });
         }
       }

@@ -1,6 +1,5 @@
 {
   "name": "Dropdown List Badge",
-  "filename": "dropdown-list-badge.js",
+  "filename": "dist/dropdown-list-badge.js",
   "render_readme": true
 }
-
