@@ -26,9 +26,12 @@ jobs:
           fetch-depth: 0  # Required to access tags
 
       - name: Download workflow run commit
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          git fetch origin ${{ github.event.workflow_run.head_branch }}
-          git checkout ${{ github.event.workflow_run.head_sha }}
+          git fetch origin "$BRANCH"
+          git checkout "$SHA"
 
       - name: Check if version.json changed
         id: version_changed
@@ -50,11 +53,12 @@ jobs:
         run: |
           VERSION=$(jq -r .version version.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Check if tag exists
         id: check
         run: |
-          if git rev-parse "v${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
             echo "Tag already exists"
             echo "tag_exists=true" >> $GITHUB_OUTPUT
           else
@@ -65,8 +69,8 @@ jobs:
         if: steps.check.outputs.tag_exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
+          tag_name: v$VERSION
+          name: v$VERSION
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

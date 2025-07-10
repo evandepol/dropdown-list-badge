@@ -1,4 +1,4 @@
-# Use official Playwright image as a base
+# Use official Playwright image
 FROM mcr.microsoft.com/playwright:v1.53.2-jammy as base
 
 # Stage 1: Install dependencies
