@@ -1,21 +1,43 @@
-name: Validate, Build, and Commit
+name: Validate, Build, and Test
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**' # This will trigger the workflow on a push to any branch
   pull_request:
-    branches: [ main ]
+    branches:
+      - main # This triggers the workflow on PRs targeting the main branch
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-# Add permissions for the build job to commit to the repository.
 permissions:
   contents: write
 
 jobs:
+  # New job to build the project and create the dist artifact
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Build TypeScript
+        run: npm run build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist/
+
   test:
     runs-on: ubuntu-latest
+    # This job doesn't need the build artifact as it builds inside Docker
     steps:
       - uses: actions/checkout@v4
 
@@ -51,44 +73,39 @@ jobs:
       - name: Stop server
         run: docker rm -f dropdown-list-badge-server || true
 
-  # This new job builds the dist directory and commits it to the repository.
-  build_and_commit_dist:
+  # This job now only commits the dist artifact, and only on pushes to main
+  commit_dist:
     runs-on: ubuntu-latest
-    needs: test # Ensures this job runs only after tests pass.
-    # This job will only run on pushes to the main branch, not on pull requests.
+    needs: [build, test] # Run after build and test succeed
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
         with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build TypeScript
-        run: npm run build
-
+          name: dist-artifact
+          path: dist
       - name: Commit and push `dist` directory
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: Build and commit dist folder for HACS"
           file_pattern: dist/
-          # This prevents the new commit from re-triggering the workflow.
           commit_options: '--no-verify'
           commit_user_name: github-actions[bot]
           commit_user_email: github-actions[bot]@users.noreply.github.com
 
   validate-hacs:
     runs-on: ubuntu-latest
-    needs: test # HACS validation should run after tests pass.
+    needs: [build, test] # Run after build and test succeed
     steps:
-      # The HACS action checks out the repository, so the dist folder must be present.
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist
       - name: HACS validation
         uses: hacs/action@main
         with:
