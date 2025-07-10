@@ -102,11 +102,22 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist-artifact
-          path: dist
+          path: dist-artifact
+      - name: Copy dist artifact into repo
+        run: |
+          rm -rf dist
+          mv dist-artifact dist
+      - name: List files for debug
+        run: |
+          ls -l
+          ls -l dist
       - name: HACS validation
         uses: hacs/action@main
         with:
           category: "plugin"
+#      - name: Clean up dist after validation (not on main)
+#        if: github.ref != 'refs/heads/main'
+#        run: rm -rf dist
 
   tag_on_version_change:
     runs-on: ubuntu-latest
