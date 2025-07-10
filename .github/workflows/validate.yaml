@@ -95,8 +95,17 @@ jobs:
           rm -rf dist
           mv dist-artifact dist
 
+      - name: Allow dist for CI
+        run: echo "!dist/" >> .gitignore
+
+      - name: Show git status for debug 1
+        run: git status
+
       - name: Force add dist directory
         run: git add -f dist/
+
+      - name: Show git status for debug 2
+        run: git status
 
       - name: Commit and push `dist` directory
         uses: stefanzweifel/git-auto-commit-action@v5
