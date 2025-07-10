@@ -17,3 +17,5 @@ tests/__snapshots__/*.png-actual.png
 
 # Node
 node_modules/
+
+dist/

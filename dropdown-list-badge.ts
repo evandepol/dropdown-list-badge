@@ -1,17 +1,33 @@
+import { HomeAssistant } from "custom-card-helpers";
+
+interface DropdownListBadgeConfig {
+  entity: string;
+  options: string[];
+  name?: string;
+  icon?: string;
+}
+
 class DropdownListBadge extends HTMLElement {
   // This is not documented in the main Home Assistant docs, but it is used 
   // internally by the Lovelace UI to filter and list custom badges.
   static type = "dropdown-list-badge";
 
+  private _dropdownOpen: boolean;
+  private _highlightedIndex: number;
+  private _config: DropdownListBadgeConfig;
+  private _hass: HomeAssistant;
+
   constructor() {
     super();
+    this._config = {} as DropdownListBadgeConfig;
+    this._hass = {} as HomeAssistant;
     this._dropdownOpen = false;
     this._highlightedIndex = -1;
     this._handleOutsideClick = this._handleOutsideClick.bind(this);
     this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
-  setConfig(config) {
+  setConfig(config: DropdownListBadgeConfig) {
     if (!config.entity || !Array.isArray(config.options)) {
       throw new Error("dropdown-list-badge requires 'entity' and 'options'");
     }
@@ -19,7 +35,7 @@ class DropdownListBadge extends HTMLElement {
     this._render();
   }
 
-  set hass(hass) {
+  set hass(hass: HomeAssistant) {
     this._hass = hass;
     if (this._config) this._render();
   }
@@ -38,14 +54,14 @@ class DropdownListBadge extends HTMLElement {
     const state = this._hass.states[this._config.entity];
     const current = state ? state.state : null;
     const options = this._config.options;
-    this._highlightedIndex = Math.max(0, options.indexOf(current));
+    this._highlightedIndex = Math.max(0, options.indexOf(current ?? ""));
     this._render();
     document.addEventListener("mousedown", this._handleOutsideClick);
     document.addEventListener("keydown", this._handleKeyDown);
     // Focus the first option for accessibility
     setTimeout(() => {
       const el = this.querySelector(".dropdown-option.highlighted");
-      if (el) el.focus();
+      if (el) (el as HTMLElement).focus();
     }, 0);
   }
 
@@ -59,15 +75,15 @@ class DropdownListBadge extends HTMLElement {
     document.removeEventListener("keydown", this._handleKeyDown);
   }
 
-  _handleOutsideClick(e) {
+  _handleOutsideClick(e: MouseEvent) {
     // Only close if the click is truly outside the dropdown
-    if (!this.contains(e.target)) {
+    if (!this.contains(e.target as Node)) {
       this._closeDropdown();
     }
   }
 
   // Handle keyboard navigation when dropdown is open
-  _handleKeyDown(e) {
+  _handleKeyDown(e: KeyboardEvent) {
     if (!this._dropdownOpen) return;
 
     const options = this._config.options;
@@ -111,12 +127,12 @@ class DropdownListBadge extends HTMLElement {
     this._render();
     // Scroll highlighted option into view
     setTimeout(() => {
-      const el = this.querySelector(".dropdown-option.highlighted");
+      const el = this.querySelector(".dropdown-option.highlighted") as HTMLElement;
       if (el) el.focus();
     }, 0);
   }
 
-  _selectOption(opt) {
+  _selectOption(opt: string) {
     // Visual feedback: flash the selected option
     const options = this._config.options;
     const idx = options.indexOf(opt);
@@ -363,7 +379,7 @@ class DropdownListBadge extends HTMLElement {
 
     
     // Attach event handler to the custom badge
-    const badge = this.querySelector(".dropdown-badge");
+    const badge = this.querySelector(".dropdown-badge") as HTMLElement;
     if (badge) {
       badge.onclick = null;
       badge.onclick = (e) => {
@@ -381,16 +397,18 @@ class DropdownListBadge extends HTMLElement {
 
     if (this._dropdownOpen) {
       this.querySelectorAll(".dropdown-option").forEach((optEl, i) => {
-        optEl.onmousedown = (e) => {
-          const value = e.currentTarget.getAttribute("data-value");
+        (optEl as HTMLElement).onmousedown = (e: MouseEvent) => {
+          const value = (e.currentTarget as HTMLElement).getAttribute("data-value");
           this._highlightedIndex = i;
           this._updateHighlight();
-          this._selectOption(value);
+          if (value !== null) {
+            this._selectOption(value);
+          }
           e.stopPropagation();
         };
-        optEl.onmouseover = () => {
+        (optEl as HTMLElement).onmouseover = () => {
           this.querySelectorAll('.dropdown-option').forEach(el => el.classList.remove('highlighted'));
-          optEl.classList.add('highlighted');
+          (optEl as HTMLElement).classList.add('highlighted');
           this._highlightedIndex = i;
         };
       });
@@ -398,12 +416,13 @@ class DropdownListBadge extends HTMLElement {
 
     // Dynamically set dropdown-list width to match the widest option
     if (this._dropdownOpen) {
-      const measure = this.querySelector('.dropdown-measure');
-      const dropdown = this.querySelector('.dropdown-list');
+      const measure = this.querySelector('.dropdown-measure') as HTMLElement;
+      const dropdown = this.querySelector('.dropdown-list') as HTMLElement;
       if (measure && dropdown) {
         let maxWidth = 0;
-        measure.childNodes.forEach(child => {
-          if (child.offsetWidth > maxWidth) maxWidth = child.offsetWidth;
+        Array.from(measure.children).forEach(child => {
+          const el = child as HTMLElement;
+          if (el.offsetWidth > maxWidth) maxWidth = el.offsetWidth;
         });
         dropdown.style.width = maxWidth + 'px';
       }
@@ -419,23 +438,30 @@ class DropdownListBadge extends HTMLElement {
 
 // Visual editor for dropdown-list-badge
 class DropdownListBadgeEditor extends HTMLElement {
+
+  private _config: DropdownListBadgeConfig;
+  private _entities: string[];
+  private _debounceTimer: ReturnType<typeof setTimeout> | null;
+  private _lastEntity: string | null;
+  private _hass: any;
+
   constructor() {
     super();
-    this._config = {};
-    this._entities = [];
+    this._config = {} as DropdownListBadgeConfig;
+    this._entities = [] as string[];
     this._debounceTimer = null;
     this._lastEntity = null;
     this.attachShadow({ mode: "open" });
   }
 
-  setConfig(config) {
+  setConfig(config: DropdownListBadgeConfig) {
     // console.log("DropdownListBadgeEditor: setConfig", config);
     const changed = JSON.stringify(this._config) !== JSON.stringify(config);
     this._config = { ...config };
     if (changed) this._render();
   }
 
-  set hass(hass) {
+  set hass(hass: HomeAssistant) {
     // console.log("DropdownListBadgeEditor: set hass");
     const oldEntities = this._entities ? this._entities.join(",") : "";
     const newEntities = Object.keys(hass.states)
@@ -451,8 +477,8 @@ class DropdownListBadgeEditor extends HTMLElement {
     return this._config;
   }
 
-  _onEntityChanged(e) {
-    const value = e.target.value;
+  _onEntityChanged(e: Event) {
+    const value = (e.target as HTMLInputElement).value;
     // console.log("DropdownListBadgeEditor: entity input changed", value);
     this._config.entity = value;
     this._emitConfigChanged();
@@ -481,9 +507,10 @@ class DropdownListBadgeEditor extends HTMLElement {
     }, 300);
   }
 
-  _onOptionToggled(e) {
-    const value = e.target.value;
-    const checked = e.target.checked;
+  _onOptionToggled(e: Event) {
+    if (!e.target) return;
+    const value = (e.target as HTMLInputElement).value;
+    const checked = (e.target as HTMLInputElement).checked;
     let options = Array.isArray(this._config.options) ? [...this._config.options] : [];
     if (checked) {
       if (!options.includes(value)) options.push(value);
@@ -506,9 +533,9 @@ class DropdownListBadgeEditor extends HTMLElement {
     if (!this.shadowRoot) return;
 
     // Focus/caret preservation
-    let focusId = null;
-    let caretPos = null;
-    const active = this.shadowRoot.activeElement;
+    let focusId: string | null = null;
+    let caretPos: number | null = null;
+    const active = this.shadowRoot.activeElement as HTMLInputElement | null;
     if (active && active.id) {
       focusId = active.id;
       if (active.selectionStart !== undefined) {
@@ -527,7 +554,20 @@ class DropdownListBadgeEditor extends HTMLElement {
     const name = this._config.name || "";
     const icon = this._config.icon || "";
 
-    this.shadowRoot.innerHTML = `
+    interface OptionRow {
+      opt: string;
+      checked: boolean;
+    }
+
+    interface RenderContext {
+      entity: string;
+      name: string;
+      icon: string;
+      possibleOptions: string[];
+      selectedOptions: string[];
+    }
+
+    this.shadowRoot!.innerHTML = `
       <style>
         .editor-root {
           display: flex;
@@ -572,7 +612,7 @@ class DropdownListBadgeEditor extends HTMLElement {
           <label for="entity">Entity</label>
           <input id="entity" type="text" value="${entity}" placeholder="e.g. input_select.my_select" list="entity-list" autocomplete="off" />
           <datalist id="entity-list">
-            ${this._entities.map(eid => `<option value="${eid}">`).join("")}
+            ${this._entities.map((eid: string) => `<option value="${eid}">`).join("")}
           </datalist>
           <div class="hint">Options will auto-populate from the entity. Use checkboxes to include/exclude.</div>
         </div>
@@ -588,7 +628,7 @@ class DropdownListBadgeEditor extends HTMLElement {
           <label>Options:</label>
           ${possibleOptions.length === 0
             ? `<div class="hint"><i>No options found for this entity.</i></div>`
-            : possibleOptions.map(opt => `
+            : possibleOptions.map((opt: string) => `
               <div class="option-row">
                 <input type="checkbox" id="opt-${opt}" value="${opt}" ${selectedOptions.includes(opt) ? "checked" : ""}/>
                 <label for="opt-${opt}">${opt}</label>
@@ -599,7 +639,7 @@ class DropdownListBadgeEditor extends HTMLElement {
     `;
 
     // Attach event listeners
-    const entityInput = this.shadowRoot.getElementById("entity");
+    const entityInput = this.shadowRoot.getElementById("entity") as HTMLInputElement;
     entityInput.oninput = this._onEntityChanged.bind(this);
     entityInput.onkeydown = (e) => {
       if (e.key === "Tab") {
@@ -617,14 +657,16 @@ class DropdownListBadgeEditor extends HTMLElement {
     };
 
     // Checkbox listeners
-    possibleOptions.forEach(opt => {
-      const cb = this.shadowRoot.getElementById(`opt-${opt}`);
-      if (cb) cb.onchange = this._onOptionToggled.bind(this);
+    possibleOptions.forEach((opt: string) => {
+      const cb: HTMLElement | null = this.shadowRoot!.getElementById(`opt-${opt}`);
+      if (cb !== null) {
+      (cb as HTMLInputElement).onchange = this._onOptionToggled.bind(this);
+      }
     });
 
     // Restore focus/caret if possible
     if (focusId) {
-      const toFocus = this.shadowRoot.getElementById(focusId);
+      const toFocus = this.shadowRoot.getElementById(focusId) as HTMLInputElement | null;
       if (toFocus) {
         toFocus.focus();
         if (caretPos !== null && toFocus.setSelectionRange) {
@@ -633,17 +675,17 @@ class DropdownListBadgeEditor extends HTMLElement {
       }
     }
 
-    const nameInput = this.shadowRoot.getElementById("badge-name");
+    const nameInput = this.shadowRoot.getElementById("badge-name") as HTMLInputElement | null;
     if (nameInput) {
-      nameInput.oninput = (e) => {
-        this._config.name = e.target.value;
+      nameInput.oninput = (e: Event)  => {
+        this._config.name = (e.target as HTMLInputElement).value;
         this._emitConfigChanged();
       };
     }
-    const iconInput = this.shadowRoot.getElementById("badge-icon");
+    const iconInput = this.shadowRoot.getElementById("badge-icon") as HTMLInputElement | null;
     if (iconInput) {
-      iconInput.oninput = (e) => {
-        this._config.icon = e.target.value;
+      iconInput.oninput = (e: Event) => {
+        this._config.icon = (e.target as HTMLInputElement).value;
         this._emitConfigChanged();
       };
     }
@@ -653,10 +695,13 @@ class DropdownListBadgeEditor extends HTMLElement {
 customElements.define("dropdown-list-badge", DropdownListBadge);
 customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
 
-// register the custom card in Home Assistant so it shows up as a custom bade
-window.customCards = window.customCards || [];
-window.customCards.push({
-  type: "dropdown-list-badge",
-  name: "Dropdown List Badge",
-  description: "A badge with a dropdown for input_select entities."
-});
+// register the custom card in Home Assistant so it shows up as a custom badge
+//window.customCards = window.customCards || [];
+//window.customCards.push({
+//  type: "dropdown-list-badge",
+//  name: "Dropdown List Badge",
+//  description: "A badge with a dropdown for input_select entities."
+//});
+
+export { DropdownListBadge };
+export { DropdownListBadgeEditor };

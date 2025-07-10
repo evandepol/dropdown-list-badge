@@ -1,28 +1,59 @@
-name: Validate tests and HACS action
+name: Validate, Build, and Test
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**'
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
-permissions: {}  
+permissions:
+  contents: write
+
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Build TypeScript
+        run: npm run build
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist/
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
       - uses: actions/checkout@v4
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+
       - name: Build Docker image
         run: docker build -t dropdown-list-badge-test .
+
+      - name: Verify dist folder in image
+        run: docker run --rm dropdown-list-badge-test ls -l dist
+
       - name: Start server
         run: |
           docker run --name dropdown-list-badge-server -d -p 5000:5000 dropdown-list-badge-test npx serve -l 5000 .
           sleep 5
+
       - name: Run Playwright tests
         run: |
           docker run --rm --network host \
@@ -31,17 +62,114 @@ jobs:
             -v ${{ github.workspace }}/tests/test-results:/app/tests/test-results \
             -v ${{ github.workspace }}/tests/html-report:/app/tests/html-report \
             dropdown-list-badge-test npx playwright test --config=tests/playwright.config.ts
+
       - name: Upload Playwright HTML report
         uses: actions/upload-artifact@v4
         with:
           name: html-report
           path: tests/html-report
+
       - name: Stop server
         run: docker rm -f dropdown-list-badge-server || true
+
+  commit_dist:
+    runs-on: ubuntu-latest
+    needs: [build, test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist
+      - name: Commit and push `dist` directory
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: Build and commit dist folder for HACS"
+          file_pattern: dist/
+          commit_options: '--no-verify'
+          commit_user_name: github-actions[bot]
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+
   validate-hacs:
     runs-on: ubuntu-latest
+    needs: [build, test]
+    continue-on-error: ${{ github.ref != 'refs/heads/main' }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-artifact
+          path: dist-artifact
+
+      - name: Copy dist artifact into repo
+        run: |
+          rm -rf dist
+          mv dist-artifact dist
+
+      - name: List files for debug
+        run: |
+          echo contents of root:
+          ls -l
+          echo contents of dist:
+          ls -l dist
+
       - name: HACS validation
         uses: hacs/action@main
         with:
           category: "plugin"
+          
+#      - name: Clean up dist after validation (not on main)
+#        if: github.ref != 'refs/heads/main'
+#        run: rm -rf dist
+
+  tag_on_version_change:
+    runs-on: ubuntu-latest
+    needs: commit_dist
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check if version.json changed
+        id: version_changed
+        run: |
+          if git show --name-only --pretty="" HEAD | grep -q "^version.json$"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Stop if version.json not changed
+        if: steps.version_changed.outputs.changed == 'false'
+        run: |
+          echo "version.json not changed, skipping tag/release."
+          exit 0
+      - name: Read version from version.json
+        id: version
+        run: |
+          VERSION=$(jq -r .version version.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Check if tag exists
+        id: check
+        run: |
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag already exists"
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create tag and release
+        if: steps.check.outputs.tag_exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
