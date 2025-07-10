@@ -19,3 +19,5 @@ tests/__snapshots__/*.png-actual.png
 node_modules/
 
 dist/
+!dist/.gitkeep
+
