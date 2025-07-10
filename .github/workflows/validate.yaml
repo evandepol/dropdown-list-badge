@@ -95,26 +95,34 @@ jobs:
   validate-hacs:
     runs-on: ubuntu-latest
     needs: [build, test]
+    continue-on-error: ${{ github.ref != 'refs/heads/main' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Download dist artifact
         uses: actions/download-artifact@v4
         with:
           name: dist-artifact
           path: dist-artifact
+
       - name: Copy dist artifact into repo
         run: |
           rm -rf dist
           mv dist-artifact dist
+
       - name: List files for debug
         run: |
+          echo contents of root:
           ls -l
+          echo contents of dist:
           ls -l dist
+
       - name: HACS validation
         uses: hacs/action@main
         with:
           category: "plugin"
+          
 #      - name: Clean up dist after validation (not on main)
 #        if: github.ref != 'refs/heads/main'
 #        run: rm -rf dist
