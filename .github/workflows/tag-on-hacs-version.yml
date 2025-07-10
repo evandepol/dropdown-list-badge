@@ -26,9 +26,12 @@ jobs:
           fetch-depth: 0  # Required to access tags
 
       - name: Download workflow run commit
+        env:
+          BRANCH: ${{ github.event.workflow_run.head_branch }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
         run: |
-          git fetch origin ${{ github.event.workflow_run.head_branch }}
-          git checkout ${{ github.event.workflow_run.head_sha }}
+          git fetch origin "$BRANCH"
+          git checkout "$SHA"
 
       - name: Check if version.json changed
         id: version_changed
