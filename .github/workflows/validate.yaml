@@ -3,10 +3,10 @@ name: Validate, Build, and Test
 on:
   push:
     branches:
-      - '**' # This will trigger the workflow on a push to any branch
+      - '**'
   pull_request:
     branches:
-      - main # This triggers the workflow on PRs targeting the main branch
+      - main
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
@@ -15,7 +15,6 @@ permissions:
   contents: write
 
 jobs:
-  # New job to build the project and create the dist artifact
   build:
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +36,6 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    # This job doesn't need the build artifact as it builds inside Docker
     steps:
       - uses: actions/checkout@v4
 
@@ -73,10 +71,9 @@ jobs:
       - name: Stop server
         run: docker rm -f dropdown-list-badge-server || true
 
-  # This job now only commits the dist artifact, and only on pushes to main
   commit_dist:
     runs-on: ubuntu-latest
-    needs: [build, test] # Run after build and test succeed
+    needs: [build, test]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
@@ -97,7 +94,8 @@ jobs:
 
   validate-hacs:
     runs-on: ubuntu-latest
-    needs: [build, test] # Run after build and test succeed
+    needs: commit_dist
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,3 +108,50 @@ jobs:
         uses: hacs/action@main
         with:
           category: "plugin"
+
+  tag_on_version_change:
+    runs-on: ubuntu-latest
+    needs: commit_dist
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check if version.json changed
+        id: version_changed
+        run: |
+          if git show --name-only --pretty="" HEAD | grep -q "^version.json$"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Stop if version.json not changed
+        if: steps.version_changed.outputs.changed == 'false'
+        run: |
+          echo "version.json not changed, skipping tag/release."
+          exit 0
+      - name: Read version from version.json
+        id: version
+        run: |
+          VERSION=$(jq -r .version version.json)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: Check if tag exists
+        id: check
+        run: |
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag already exists"
+            echo "tag_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "tag_exists=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Create tag and release
+        if: steps.check.outputs.tag_exists == 'false'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          name: v${{ steps.version.outputs.version }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
