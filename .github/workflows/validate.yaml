@@ -78,7 +78,7 @@ jobs:
 
   commit_dist:
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [build, test, codeql-analysis]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
@@ -118,7 +118,7 @@ jobs:
 
   validate-hacs:
     runs-on: ubuntu-latest
-    needs: [build, test]
+    needs: [commit_dist]
     continue-on-error: ${{ github.ref != 'refs/heads/main' }}
     steps:
       - name: Checkout code
