@@ -420,7 +420,7 @@ class DropdownListBadge extends HTMLElement {
       const dropdown = this.querySelector('.dropdown-list') as HTMLElement;
       if (measure && dropdown) {
         let maxWidth = 0;
-        measure.childNodes.forEach(child => {
+        Array.from(measure.children).forEach(child => {
           const el = child as HTMLElement;
           if (el.offsetWidth > maxWidth) maxWidth = el.offsetWidth;
         });
@@ -533,8 +533,8 @@ class DropdownListBadgeEditor extends HTMLElement {
     if (!this.shadowRoot) return;
 
     // Focus/caret preservation
-    let focusId = null;
-    let caretPos = null;
+    let focusId: string | null = null;
+    let caretPos: number | null = null;
     const active = this.shadowRoot.activeElement as HTMLInputElement | null;
     if (active && active.id) {
       focusId = active.id;
