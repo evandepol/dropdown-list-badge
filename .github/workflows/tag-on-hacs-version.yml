@@ -1,12 +1,5 @@
 name: Auto Tag on HACS Version Change
 
-#on:
-#  push:
-#    paths:
-#      - 'version.json'
-#    branches:
-#      - main
-
 on:
   workflow_run:
     workflows: ["Validate tests and HACS action"]
