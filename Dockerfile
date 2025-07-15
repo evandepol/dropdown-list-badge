@@ -1,8 +1,8 @@
 # Use official Playwright image
-FROM mcr.microsoft.com/playwright:v1.54.1-jammy as base
+FROM mcr.microsoft.com/playwright:v1.54.1-jammy AS base
 
 # Stage 1: Install dependencies
-FROM base as deps
+FROM base AS deps
 WORKDIR /app
 #COPY package.json package-lock.json ./
 COPY package.json ./
@@ -10,14 +10,16 @@ COPY package.json ./
 RUN npm install --omit=optional
 
 # Stage 2: Build the application
-FROM base as builder
+FROM base AS builder
 WORKDIR /app
 # Copy dependencies from the previous stage
 COPY --from=deps /app/node_modules ./node_modules
 # Copy all source files
 COPY . .
 # Install Playwright browsers
+RUN ls -l /ms-playwright/
 RUN npx playwright install --with-deps
+RUN ls -l /ms-playwright/
 # Build the TypeScript files
 RUN npm run build
 

@@ -2,7 +2,7 @@
   "name": "dropdown-list-badge-tests",
   "private": true,
   "devDependencies": {
-    "@playwright/test": "1.53.2",
+    "@playwright/test": "1.54.1",
     "@types/node": "^24.0.12",
     "serve": "^14.2.0",
     "typescript": "^5.8.3"
@@ -75,8 +75,8 @@
     "path-is-inside": "^1.0.2",
     "path-key": "^3.1.1",
     "path-to-regexp": "^3.3.0",
-    "playwright": "1.53.2",
-    "playwright-core": "1.53.2",
+    "playwright": "1.54.1",
+    "playwright-core": "1.54.1",
     "punycode": "^2.3.1",
     "range-parser": "^1.2.0",
     "rc": "^1.2.8",

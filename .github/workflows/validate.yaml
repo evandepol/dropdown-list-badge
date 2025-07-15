@@ -101,20 +101,16 @@ jobs:
       - name: Show git status for debug 1
         run: git status
 
-      - name: Force add dist directory
-        run: git add -f dist/
-
-      - name: Show git status for debug 2
-        run: git status
-
-      - name: Commit and push `dist` directory
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Create Pull Request for dist update
+        uses: peter-evans/create-pull-request@v5
         with:
-          commit_message: "chore: Build and commit dist folder for HACS"
-          file_pattern: dist/
-          commit_options: '--no-verify'
-          commit_user_name: github-actions[bot]
-          commit_user_email: github-actions[bot]@users.noreply.github.com
+          commit-message: "chore: Build and commit dist folder for HACS"
+          branch: update-dist-artifact
+          title: "Update dist folder from CI"
+          body: "Automated update of dist folder after successful build and test."
+          base: main
+          add-paths: dist/
+          author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
 
   validate-hacs:
     runs-on: ubuntu-latest
