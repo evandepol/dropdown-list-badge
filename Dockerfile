@@ -17,7 +17,9 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy all source files
 COPY . .
 # Install Playwright browsers
+RUN ls -l /ms-playwright/
 RUN npx playwright install --with-deps
+RUN ls -l /ms-playwright/
 # Build the TypeScript files
 RUN npm run build
 
