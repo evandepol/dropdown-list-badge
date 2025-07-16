@@ -21,11 +21,6 @@ RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 # Copy all source files
 COPY . .
 
-# Inject version into TypeScript before build
-RUN VERSION=$(jq -r .version version.json) && \
-    sed -i "s/__VERSION__/$VERSION/g" dropdown-list-badge.ts && \
-    grep BADGE_VERSION dropdown-list-badge.ts
-
 # Build the TypeScript files
 RUN npm run build
 

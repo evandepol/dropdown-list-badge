@@ -32,6 +32,15 @@ export default defineConfig({
     trace: 'retain-on-failure',
     actionTimeout: 10000,
     navigationTimeout: 20000,
+    launchOptions: {
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--font-render-hinting=none',
+      ],
+    },
   },
   projects: [
     {

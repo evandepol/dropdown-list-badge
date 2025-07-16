@@ -4,12 +4,14 @@
   "devDependencies": {
     "@playwright/test": "1.54.1",
     "@types/node": "^24.0.14",
+    "esbuild": "^0.25.6",
     "serve": "^14.2.0",
     "typescript": "^5.8.3"
   },
   "scripts": {
     "serve": "serve -l 5000 .",
-    "build": "tsc",
+    "prebuild": "VERSION=$(jq -r .version version.json) && sed -i \"s/__VERSION__/$VERSION/g\" dropdown-list-badge.ts",
+    "build": "tsc --noEmit && esbuild dropdown-list-badge.ts --bundle --outfile=dist/dropdown-list-badge.js --target=es2017 --format=iife",
     "test": "npm run build && playwright test",
     "build-and-test": "npm run build && npm run test"
   },
