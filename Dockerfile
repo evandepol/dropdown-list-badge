@@ -8,18 +8,17 @@ WORKDIR /app
 COPY package.json ./
 # Use npm install which is more forgiving of platform-specific optional dependencies
 RUN npm install --omit=optional
+# Install Playwright browsers
+RUN npx playwright install --with-deps
 
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
 # Copy dependencies from the previous stage
 COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /ms-playwright /ms-playwright
 # Copy all source files
 COPY . .
-# Install Playwright browsers
-RUN ls -l /ms-playwright/
-RUN npx playwright install --with-deps
-RUN ls -l /ms-playwright/
 # Build the TypeScript files
 RUN npm run build
 
@@ -33,4 +32,4 @@ COPY --from=builder /app .
 EXPOSE 5000
 
 # Default command to serve the files, allowing tests to be run against it
-CMD ["npx", "serve", "-l", "5000", "."]
+CMD ["sh", "-c", "NPM_CONFIG_OMIT=optional npx serve -l 5000 ."]

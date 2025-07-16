@@ -63,6 +63,7 @@ docker run --rm --network host \
   -v "$(pwd)/tests/__snapshots__:/app/tests/__snapshots__" \
   -v "$(pwd)/tests/test-results:/app/tests/test-results" \
   -v "$(pwd)/tests/html-report:/app/tests/html-report" \
+  -e NPM_CONFIG_OMIT=optional \
   $IMAGE npx playwright test --config=tests/playwright.config.ts $UPDATE_SNAPSHOTS
 
 echo "Stopping server container..."
