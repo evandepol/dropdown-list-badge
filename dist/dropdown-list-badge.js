@@ -596,12 +596,11 @@
       }
     }
   };
-  var BADGE_VERSION = "0.3.8-6";
+  var BADGE_VERSION = "0.3.8-7";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
-  globalThis.customCards = globalThis.customCards || [];
-  window.customCards = window.customCards || globalThis.customCards;
-  globalThis.customCards.push({
+  var cards = globalThis.customCards = globalThis.customCards || [];
+  cards.push({
     type: "dropdown-list-badge",
     name: "Dropdown List Badge",
     description: "A badge with a dropdown for input_select entities."
