@@ -130,7 +130,7 @@
       this._closeDropdown();
     }
     _render() {
-      if (!this._hass || !this._config) return;
+      if (!this._hass || !this._hass.states || !this._config) return;
       const state = this._hass.states[this._config.entity];
       if (!state) {
         this.innerHTML = `<span style="color: red;">Entity not found</span>`;
@@ -596,7 +596,7 @@
       }
     }
   };
-  var BADGE_VERSION = "0.3.8-8";
+  var BADGE_VERSION = "0.3.8-9";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
   var cards = globalThis.customCards = globalThis.customCards || [];
