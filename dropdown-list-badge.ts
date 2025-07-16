@@ -642,8 +642,8 @@ class DropdownListBadgeEditor extends HTMLElement {
               </div>
             `).join("")}
         </div>
-        <div style="text-align:right; color:#bbb; font-size:11px; margin-top:16px;">
-          (version: ${BADGE_VERSION})
+        <div id="badge-version" style="text-align:right; color:#bbb; font-size:11px; margin-top:16px;">
+          ${BADGE_VERSION}
         </div>
       </div>
     `;

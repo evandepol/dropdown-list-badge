@@ -32,19 +32,37 @@ export default defineConfig({
     trace: 'retain-on-failure',
     actionTimeout: 10000,
     navigationTimeout: 20000,
+    // Remove launchOptions.args from here to avoid passing Chromium flags to all browsers
   },
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: {
+        ...devices['Desktop Chrome'],
+        launchOptions: {
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--font-render-hinting=none',
+          ],
+        },
+      },
     },
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: {
+        ...devices['Desktop Firefox'],
+        // No Chromium flags here
+      },
     },
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: {
+        ...devices['Desktop Safari'],
+        // No Chromium flags here
+      },
     },
   ],
   retries: 1,

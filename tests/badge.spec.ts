@@ -136,3 +136,29 @@ test('visual regression: dropdown open', async ({ page }) => {
   await page.screenshot({ path: 'tests/results/badge-dropdown-open.png' });
   expect(await page.screenshot()).toMatchSnapshot('badge-dropdown-open.png');
 });
+
+test('badge editor displays version', async ({ page }) => {
+  await page.evaluate(() => {
+    const editor = document.createElement('dropdown-list-badge-editor') as DropdownListBadgeEditor;
+    document.body.appendChild(editor);
+    editor.setConfig({
+      entity: "input_select.test",
+      options: ["Option 1", "Option 2", "Option 3"],
+      name: 'Test Badge',
+      icon: "mdi:star"
+    });
+    editor.hass = window.hassStub;
+  });
+
+  // Print the shadow DOM for debugging
+  const html = await page.locator('dropdown-list-badge-editor').evaluate(
+    el => (el.shadowRoot ? el.shadowRoot.innerHTML : 'NO SHADOW ROOT')
+  );
+
+  // Now try to get the version text
+  const versionText = await page.locator('dropdown-list-badge-editor').evaluate((el) => {
+    const versionEl = el.shadowRoot?.getElementById('badge-version');
+    return versionEl ? versionEl.textContent : null;
+  });
+  expect(versionText).not.toContain('__VERSION__');
+});
