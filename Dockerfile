@@ -19,6 +19,11 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /ms-playwright /ms-playwright
 # Copy all source files
 COPY . .
+
+# Inject version into TypeScript before build
+RUN VERSION=$(jq -r .version version.json) && \
+    sed -i "s/__VERSION__/$VERSION/g" dropdown-list-badge.ts
+
 # Build the TypeScript files
 RUN npm run build
 
