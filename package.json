@@ -60,7 +60,7 @@
     "is-fullwidth-code-point": "^3.0.0",
     "is-port-reachable": "^4.0.0",
     "is-stream": "^2.0.1",
-    "is-wsl": "^2.2.0",
+    "is-wsl": "^3.1.0",
     "isexe": "^2.0.0",
     "json-schema-traverse": "^1.0.0",
     "merge-stream": "^2.0.0",
