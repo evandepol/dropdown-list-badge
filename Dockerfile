@@ -17,6 +17,7 @@ WORKDIR /app
 # Copy dependencies from the previous stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /ms-playwright /ms-playwright
+RUN apt-get update && apt-get install -y jq
 # Copy all source files
 COPY . .
 
