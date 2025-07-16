@@ -95,7 +95,7 @@
     "strip-final-newline": "^4.0.0",
     "strip-json-comments": "^2.0.1",
     "supports-color": "^7.2.0",
-    "type-fest": "^2.19.0",
+    "type-fest": "^4.41.0",
     "update-check": "^1.5.4",
     "uri-js": "^4.4.1",
     "vary": "^1.1.2",
