@@ -170,7 +170,7 @@ class DropdownListBadge extends HTMLElement {
   }
 
   _render() {
-    if (!this._hass || !this._config) return;
+    if (!this._hass || !this._hass.states || !this._config) return;
     const state = this._hass.states[this._config.entity];
     if (!state) {
       this.innerHTML = `<span style="color: red;">Entity not found</span>`;
