@@ -17,8 +17,14 @@ WORKDIR /app
 # Copy dependencies from the previous stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /ms-playwright /ms-playwright
+RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 # Copy all source files
 COPY . .
+
+# Inject version into TypeScript before build
+RUN VERSION=$(jq -r .version version.json) && \
+    sed -i "s/__VERSION__/$VERSION/g" dropdown-list-badge.ts
+
 # Build the TypeScript files
 RUN npm run build
 

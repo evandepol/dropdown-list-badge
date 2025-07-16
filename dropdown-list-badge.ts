@@ -642,6 +642,9 @@ class DropdownListBadgeEditor extends HTMLElement {
               </div>
             `).join("")}
         </div>
+        <div style="text-align:right; color:#bbb; font-size:11px; margin-top:16px;">
+          Version: ${BADGE_VERSION}
+        </div>
       </div>
     `;
 
@@ -698,6 +701,8 @@ class DropdownListBadgeEditor extends HTMLElement {
     }
   }
 }
+
+const BADGE_VERSION = "__VERSION__";
 
 customElements.define("dropdown-list-badge", DropdownListBadge);
 customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
