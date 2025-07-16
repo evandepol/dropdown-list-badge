@@ -85,7 +85,7 @@ jobs:
 
   commit_dist:
     runs-on: ubuntu-latest
-    needs: [build, test, codeql-analysis]
+    needs: [build_and_test, codeql-analysis]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
