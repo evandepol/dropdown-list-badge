@@ -1,145 +1,146 @@
-class DropdownListBadge extends HTMLElement {
+"use strict";
+(() => {
+  var __defProp = Object.defineProperty;
+  var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
+  var __propIsEnum = Object.prototype.propertyIsEnumerable;
+  var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+  var __spreadValues = (a, b) => {
+    for (var prop in b || (b = {}))
+      if (__hasOwnProp.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    if (__getOwnPropSymbols)
+      for (var prop of __getOwnPropSymbols(b)) {
+        if (__propIsEnum.call(b, prop))
+          __defNormalProp(a, prop, b[prop]);
+      }
+    return a;
+  };
+
+  // dropdown-list-badge.ts
+  var DropdownListBadge = class extends HTMLElement {
     constructor() {
-        super();
-        this._config = {};
-        this._hass = {};
-        this._dropdownOpen = false;
-        this._highlightedIndex = -1;
-        this._handleOutsideClick = this._handleOutsideClick.bind(this);
-        this._handleKeyDown = this._handleKeyDown.bind(this);
+      super();
+      this._config = {};
+      this._hass = {};
+      this._dropdownOpen = false;
+      this._highlightedIndex = -1;
+      this._handleOutsideClick = this._handleOutsideClick.bind(this);
+      this._handleKeyDown = this._handleKeyDown.bind(this);
     }
     setConfig(config) {
-        if (!config.entity || !Array.isArray(config.options)) {
-            throw new Error("dropdown-list-badge requires 'entity' and 'options'");
-        }
-        this._config = config;
-        this._render();
+      if (!config.entity || !Array.isArray(config.options)) {
+        throw new Error("dropdown-list-badge requires 'entity' and 'options'");
+      }
+      this._config = config;
+      this._render();
     }
     set hass(hass) {
-        this._hass = hass;
-        if (this._config)
-            this._render();
+      this._hass = hass;
+      if (this._config) this._render();
     }
     static getConfigElement() {
-        return document.createElement('dropdown-list-badge-editor');
+      return document.createElement("dropdown-list-badge-editor");
     }
     static getStubConfig() {
-        return { entity: 'input_select.example', options: ['Option 1', 'Option 2', 'Option 3'] };
+      return { entity: "input_select.example", options: ["Option 1", "Option 2", "Option 3"] };
     }
     _openDropdown() {
-        this._dropdownOpen = true;
-        // Set highlighted index to current value or first option
-        const state = this._hass.states[this._config.entity];
-        const current = state ? state.state : null;
-        const options = this._config.options;
-        this._highlightedIndex = Math.max(0, options.indexOf(current ?? ""));
-        this._render();
-        document.addEventListener("mousedown", this._handleOutsideClick);
-        document.addEventListener("keydown", this._handleKeyDown);
-        // Focus the first option for accessibility
-        setTimeout(() => {
-            const el = this.querySelector(".dropdown-option.highlighted");
-            if (el)
-                el.focus();
-        }, 0);
+      this._dropdownOpen = true;
+      const state = this._hass.states[this._config.entity];
+      const current = state ? state.state : null;
+      const options = this._config.options;
+      this._highlightedIndex = Math.max(0, options.indexOf(current != null ? current : ""));
+      this._render();
+      document.addEventListener("mousedown", this._handleOutsideClick);
+      document.addEventListener("keydown", this._handleKeyDown);
+      setTimeout(() => {
+        const el = this.querySelector(".dropdown-option.highlighted");
+        if (el) el.focus();
+      }, 0);
     }
     // Close the open dropdown: reset highlight, rerender, and remove global listeners
     _closeDropdown() {
-        this._dropdownOpen = false;
-        this._highlightedIndex = -1;
-        this._render();
-        document.removeEventListener("mousedown", this._handleOutsideClick);
-        document.removeEventListener("keydown", this._handleKeyDown);
+      this._dropdownOpen = false;
+      this._highlightedIndex = -1;
+      this._render();
+      document.removeEventListener("mousedown", this._handleOutsideClick);
+      document.removeEventListener("keydown", this._handleKeyDown);
     }
     _handleOutsideClick(e) {
-        // Only close if the click is truly outside the dropdown
-        if (!this.contains(e.target)) {
-            this._closeDropdown();
-        }
+      if (!this.contains(e.target)) {
+        this._closeDropdown();
+      }
     }
     // Handle keyboard navigation when dropdown is open
     _handleKeyDown(e) {
-        if (!this._dropdownOpen)
-            return;
-        const options = this._config.options;
-        switch (e.key) {
-            case "Escape":
-                // Close on Escape
-                this._closeDropdown();
-                break;
-            case "ArrowDown":
-                e.preventDefault();
-                // Move highlight down, wrapping around
-                this._highlightedIndex = (this._highlightedIndex + 1) % options.length;
-                this._updateHighlight();
-                break;
-            case "ArrowUp":
-                e.preventDefault();
-                // Move highlight up, wrapping around
-                this._highlightedIndex =
-                    (this._highlightedIndex - 1 + options.length) % options.length;
-                this._updateHighlight();
-                break;
-            case "Enter":
-                // Select the currently highlighted option
-                if (this._highlightedIndex >= 0 &&
-                    this._highlightedIndex < options.length) {
-                    this._selectOption(options[this._highlightedIndex]);
-                }
-                break;
-            // Other keys are ignored
-        }
+      if (!this._dropdownOpen) return;
+      const options = this._config.options;
+      switch (e.key) {
+        case "Escape":
+          this._closeDropdown();
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          this._highlightedIndex = (this._highlightedIndex + 1) % options.length;
+          this._updateHighlight();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          this._highlightedIndex = (this._highlightedIndex - 1 + options.length) % options.length;
+          this._updateHighlight();
+          break;
+        case "Enter":
+          if (this._highlightedIndex >= 0 && this._highlightedIndex < options.length) {
+            this._selectOption(options[this._highlightedIndex]);
+          }
+          break;
+      }
     }
     _updateHighlight() {
-        this._render();
-        // Scroll highlighted option into view
-        setTimeout(() => {
-            const el = this.querySelector(".dropdown-option.highlighted");
-            if (el)
-                el.focus();
-        }, 0);
+      this._render();
+      setTimeout(() => {
+        const el = this.querySelector(".dropdown-option.highlighted");
+        if (el) el.focus();
+      }, 0);
     }
     _selectOption(opt) {
-        // Visual feedback: flash the selected option
-        const options = this._config.options;
-        const idx = options.indexOf(opt);
-        if (this._dropdownOpen && idx !== -1) {
-            const optionEls = this.querySelectorAll(".dropdown-option");
-            const el = optionEls[idx];
-            if (el) {
-                el.classList.add("just-selected");
-                setTimeout(() => {
-                    el.classList.remove("just-selected");
-                    // Now close the dropdown and call the service
-                    this._hass.callService("input_select", "select_option", {
-                        entity_id: this._config.entity,
-                        option: opt
-                    });
-                    this._closeDropdown();
-                }, 300);
-                return; // Prevent immediate close
-            }
+      const options = this._config.options;
+      const idx = options.indexOf(opt);
+      if (this._dropdownOpen && idx !== -1) {
+        const optionEls = this.querySelectorAll(".dropdown-option");
+        const el = optionEls[idx];
+        if (el) {
+          el.classList.add("just-selected");
+          setTimeout(() => {
+            el.classList.remove("just-selected");
+            this._hass.callService("input_select", "select_option", {
+              entity_id: this._config.entity,
+              option: opt
+            });
+            this._closeDropdown();
+          }, 300);
+          return;
         }
-        // Fallback: if not found, just proceed
-        this._hass.callService("input_select", "select_option", {
-            entity_id: this._config.entity,
-            option: opt
-        });
-        this._closeDropdown();
+      }
+      this._hass.callService("input_select", "select_option", {
+        entity_id: this._config.entity,
+        option: opt
+      });
+      this._closeDropdown();
     }
     _render() {
-        if (!this._hass || !this._config)
-            return;
-        const state = this._hass.states[this._config.entity];
-        if (!state) {
-            this.innerHTML = `<span style="color: red;">Entity not found</span>`;
-            return;
-        }
-        const current = state.state;
-        const options = this._config.options;
-        const name = this._config.name || "";
-        const icon = this._config.icon || "";
-        this.innerHTML = `
+      if (!this._hass || !this._config) return;
+      const state = this._hass.states[this._config.entity];
+      if (!state) {
+        this.innerHTML = `<span style="color: red;">Entity not found</span>`;
+        return;
+      }
+      const current = state.state;
+      const options = this._config.options;
+      const name = this._config.name || "";
+      const icon = this._config.icon || "";
+      this.innerHTML = `
       <style>
         .badge-wrapper {
           display: flex;
@@ -321,9 +322,9 @@ class DropdownListBadge extends HTMLElement {
         ${this._dropdownOpen ? `
           <div class="dropdown-list" role="listbox">
             ${options.map((opt, i) => {
-            const selectedClass = (!this._dropdownOpen && opt === current) ? ' selected' : '';
-            const highlightedClass = (i === this._highlightedIndex) ? ' highlighted' : '';
-            return `
+        const selectedClass = !this._dropdownOpen && opt === current ? " selected" : "";
+        const highlightedClass = i === this._highlightedIndex ? " highlighted" : "";
+        return `
                 <div
                   class="dropdown-option${selectedClass}${highlightedClass}"
                   data-value="${opt}"
@@ -332,179 +333,152 @@ class DropdownListBadge extends HTMLElement {
                   aria-selected="${opt === current ? "true" : "false"}"
                 >${opt}</div>
               `;
-        }).join('')}
+      }).join("")}
           </div>
           <div class="dropdown-measure">
-            ${options.map(opt => `<div>${opt}</div>`).join('')}
+            ${options.map((opt) => `<div>${opt}</div>`).join("")}
           </div>
-        ` : ''}
+        ` : ""}
       </div>
     `;
-        // Attach event handler to the custom badge
-        const badge = this.querySelector(".dropdown-badge");
-        if (badge) {
-            badge.onclick = null;
-            badge.onclick = (e) => {
-                if (!this._dropdownOpen) {
-                    this._openDropdown();
-                }
-            };
-            badge.onkeydown = (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    this._openDropdown();
-                }
-            };
-        }
-        if (this._dropdownOpen) {
-            this.querySelectorAll(".dropdown-option").forEach((optEl, i) => {
-                optEl.onmousedown = (e) => {
-                    const value = e.currentTarget.getAttribute("data-value");
-                    this._highlightedIndex = i;
-                    this._updateHighlight();
-                    if (value !== null) {
-                        this._selectOption(value);
-                    }
-                    e.stopPropagation();
-                };
-                optEl.onmouseover = () => {
-                    this.querySelectorAll('.dropdown-option').forEach(el => el.classList.remove('highlighted'));
-                    optEl.classList.add('highlighted');
-                    this._highlightedIndex = i;
-                };
-            });
-        }
-        // Dynamically set dropdown-list width to match the widest option
-        if (this._dropdownOpen) {
-            const measure = this.querySelector('.dropdown-measure');
-            const dropdown = this.querySelector('.dropdown-list');
-            if (measure && dropdown) {
-                let maxWidth = 0;
-                Array.from(measure.children).forEach(child => {
-                    const el = child;
-                    if (el.offsetWidth > maxWidth)
-                        maxWidth = el.offsetWidth;
-                });
-                dropdown.style.width = maxWidth + 'px';
+      const badge = this.querySelector(".dropdown-badge");
+      if (badge) {
+        badge.onclick = null;
+        badge.onclick = (e) => {
+          if (!this._dropdownOpen) {
+            this._openDropdown();
+          }
+        };
+        badge.onkeydown = (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            this._openDropdown();
+          }
+        };
+      }
+      if (this._dropdownOpen) {
+        this.querySelectorAll(".dropdown-option").forEach((optEl, i) => {
+          optEl.onmousedown = (e) => {
+            const value = e.currentTarget.getAttribute("data-value");
+            this._highlightedIndex = i;
+            this._updateHighlight();
+            if (value !== null) {
+              this._selectOption(value);
             }
+            e.stopPropagation();
+          };
+          optEl.onmouseover = () => {
+            this.querySelectorAll(".dropdown-option").forEach((el) => el.classList.remove("highlighted"));
+            optEl.classList.add("highlighted");
+            this._highlightedIndex = i;
+          };
+        });
+      }
+      if (this._dropdownOpen) {
+        const measure = this.querySelector(".dropdown-measure");
+        const dropdown = this.querySelector(".dropdown-list");
+        if (measure && dropdown) {
+          let maxWidth = 0;
+          Array.from(measure.children).forEach((child) => {
+            const el = child;
+            if (el.offsetWidth > maxWidth) maxWidth = el.offsetWidth;
+          });
+          dropdown.style.width = maxWidth + "px";
         }
+      }
     }
     getCardSize() {
-        return 1;
+      return 1;
     }
-}
-// This is not documented in the main Home Assistant docs, but it is used 
-// internally by the Lovelace UI to filter and list custom badges.
-DropdownListBadge.type = "dropdown-list-badge";
-// Visual editor for dropdown-list-badge
-class DropdownListBadgeEditor extends HTMLElement {
+  };
+  // This is not documented in the main Home Assistant docs, but it is used 
+  // internally by the Lovelace UI to filter and list custom badges.
+  DropdownListBadge.type = "dropdown-list-badge";
+  var DropdownListBadgeEditor = class extends HTMLElement {
     constructor() {
-        super();
-        this._config = {};
-        this._entities = [];
-        this._debounceTimer = null;
-        this._lastEntity = null;
-        this.attachShadow({ mode: "open" });
+      super();
+      this._config = {};
+      this._entities = [];
+      this._debounceTimer = null;
+      this._lastEntity = null;
+      this.attachShadow({ mode: "open" });
     }
     setConfig(config) {
-        // console.log("DropdownListBadgeEditor: setConfig", config);
-        const changed = JSON.stringify(this._config) !== JSON.stringify(config);
-        this._config = { ...config };
-        if (changed)
-            this._render();
+      const changed = JSON.stringify(this._config) !== JSON.stringify(config);
+      this._config = __spreadValues({}, config);
+      if (changed) this._render();
     }
     set hass(hass) {
-        // console.log("DropdownListBadgeEditor: set hass");
-        const oldEntities = this._entities ? this._entities.join(",") : "";
-        const newEntities = Object.keys(hass.states)
-            .filter(eid => hass.states[eid].attributes.options)
-            .sort();
-        const changed = oldEntities !== newEntities.join(",");
-        this._hass = hass;
-        this._entities = newEntities;
-        if (changed)
-            this._render();
+      const oldEntities = this._entities ? this._entities.join(",") : "";
+      const newEntities = Object.keys(hass.states).filter((eid) => hass.states[eid].attributes.options).sort();
+      const changed = oldEntities !== newEntities.join(",");
+      this._hass = hass;
+      this._entities = newEntities;
+      if (changed) this._render();
     }
     get config() {
-        return this._config;
+      return this._config;
     }
     _onEntityChanged(e) {
-        const value = e.target.value;
-        // console.log("DropdownListBadgeEditor: entity input changed", value);
-        this._config.entity = value;
-        this._emitConfigChanged();
-        // Debounce: wait after last keystroke before trying to fetch options
-        if (this._debounceTimer)
-            clearTimeout(this._debounceTimer);
-        this._debounceTimer = setTimeout(() => {
-            // console.log("DropdownListBadgeEditor: debounce timer fired for entity", value);
-            if (this._hass && value && this._hass.states[value]) {
-                const opts = this._hass.states[value].attributes.options;
-                if (Array.isArray(opts)) {
-                    // If entity changed, select all by default
-                    if (this._lastEntity !== value) {
-                        this._config.options = [...opts];
-                        this._lastEntity = value;
-                    }
-                    else {
-                        // If entity did not change, preserve current selections (intersection)
-                        const current = Array.isArray(this._config.options) ? this._config.options : [];
-                        this._config.options = opts.filter(opt => current.includes(opt));
-                    }
-                    // console.log("DropdownListBadgeEditor: options updated from entity", opts);
-                    this._emitConfigChanged();
-                    this._render();
-                }
+      const value = e.target.value;
+      this._config.entity = value;
+      this._emitConfigChanged();
+      if (this._debounceTimer) clearTimeout(this._debounceTimer);
+      this._debounceTimer = setTimeout(() => {
+        if (this._hass && value && this._hass.states[value]) {
+          const opts = this._hass.states[value].attributes.options;
+          if (Array.isArray(opts)) {
+            if (this._lastEntity !== value) {
+              this._config.options = [...opts];
+              this._lastEntity = value;
+            } else {
+              const current = Array.isArray(this._config.options) ? this._config.options : [];
+              this._config.options = opts.filter((opt) => current.includes(opt));
             }
-        }, 300);
+            this._emitConfigChanged();
+            this._render();
+          }
+        }
+      }, 300);
     }
     _onOptionToggled(e) {
-        if (!e.target)
-            return;
-        const value = e.target.value;
-        const checked = e.target.checked;
-        let options = Array.isArray(this._config.options) ? [...this._config.options] : [];
-        if (checked) {
-            if (!options.includes(value))
-                options.push(value);
-        }
-        else {
-            options = options.filter(opt => opt !== value);
-        }
-        this._config.options = options;
-        this._emitConfigChanged();
+      if (!e.target) return;
+      const value = e.target.value;
+      const checked = e.target.checked;
+      let options = Array.isArray(this._config.options) ? [...this._config.options] : [];
+      if (checked) {
+        if (!options.includes(value)) options.push(value);
+      } else {
+        options = options.filter((opt) => opt !== value);
+      }
+      this._config.options = options;
+      this._emitConfigChanged();
     }
     _emitConfigChanged() {
-        // console.log("DropdownListBadgeEditor: config-changed", this._config);
-        this.dispatchEvent(new CustomEvent("config-changed", {
-            detail: { config: this._config }
-        }));
+      this.dispatchEvent(new CustomEvent("config-changed", {
+        detail: { config: this._config }
+      }));
     }
     _render() {
-        // console.log("DropdownListBadgeEditor: _render");
-        if (!this.shadowRoot)
-            return;
-        // Focus/caret preservation
-        let focusId = null;
-        let caretPos = null;
-        const active = this.shadowRoot.activeElement;
-        if (active && active.id) {
-            focusId = active.id;
-            if (active.selectionStart !== undefined) {
-                caretPos = active.selectionStart;
-            }
+      if (!this.shadowRoot) return;
+      let focusId = null;
+      let caretPos = null;
+      const active = this.shadowRoot.activeElement;
+      if (active && active.id) {
+        focusId = active.id;
+        if (active.selectionStart !== void 0) {
+          caretPos = active.selectionStart;
         }
-        const entity = this._config.entity || "";
-        // Get possible options from entity, or empty array
-        let possibleOptions = [];
-        if (this._hass && entity && this._hass.states[entity]) {
-            possibleOptions = this._hass.states[entity].attributes.options || [];
-        }
-        // Get selected options from config
-        const selectedOptions = Array.isArray(this._config.options) ? this._config.options : [];
-        const name = this._config.name || "";
-        const icon = this._config.icon || "";
-        this.shadowRoot.innerHTML = `
+      }
+      const entity = this._config.entity || "";
+      let possibleOptions = [];
+      if (this._hass && entity && this._hass.states[entity]) {
+        possibleOptions = this._hass.states[entity].attributes.options || [];
+      }
+      const selectedOptions = Array.isArray(this._config.options) ? this._config.options : [];
+      const name = this._config.name || "";
+      const icon = this._config.icon || "";
+      this.shadowRoot.innerHTML = `
       <style>
         .editor-root {
           display: flex;
@@ -563,80 +537,72 @@ class DropdownListBadgeEditor extends HTMLElement {
         </div>
         <div class="options-list">
           <label>Options:</label>
-          ${possibleOptions.length === 0
-            ? `<div class="hint"><i>No options found for this entity.</i></div>`
-            : possibleOptions.map((opt) => `
+          ${possibleOptions.length === 0 ? `<div class="hint"><i>No options found for this entity.</i></div>` : possibleOptions.map((opt) => `
               <div class="option-row">
                 <input type="checkbox" id="opt-${opt}" value="${opt}" ${selectedOptions.includes(opt) ? "checked" : ""}/>
                 <label for="opt-${opt}">${opt}</label>
               </div>
             `).join("")}
         </div>
-        <div style="text-align:right; color:#bbb; font-size:11px; margin-top:16px;">
-          (version: ${BADGE_VERSION})
+        <div id="badge-version" style="text-align:right; color:#bbb; font-size:11px; margin-top:16px;">
+          ${BADGE_VERSION}
         </div>
       </div>
     `;
-        // Attach event listeners
-        const entityInput = this.shadowRoot.getElementById("entity");
-        entityInput.oninput = this._onEntityChanged.bind(this);
-        entityInput.onkeydown = (e) => {
-            if (e.key === "Tab") {
-                const val = entityInput.value.trim().toLowerCase();
-                if (val.length > 0) {
-                    const matches = this._entities.filter(eid => eid.toLowerCase().startsWith(val));
-                    if (matches.length === 1 && matches[0] !== entityInput.value) {
-                        entityInput.value = matches[0];
-                        entityInput.setSelectionRange(matches[0].length, matches[0].length);
-                        entityInput.dispatchEvent(new Event("input", { bubbles: true }));
-                        e.preventDefault();
-                    }
-                }
+      const entityInput = this.shadowRoot.getElementById("entity");
+      entityInput.oninput = this._onEntityChanged.bind(this);
+      entityInput.onkeydown = (e) => {
+        if (e.key === "Tab") {
+          const val = entityInput.value.trim().toLowerCase();
+          if (val.length > 0) {
+            const matches = this._entities.filter((eid) => eid.toLowerCase().startsWith(val));
+            if (matches.length === 1 && matches[0] !== entityInput.value) {
+              entityInput.value = matches[0];
+              entityInput.setSelectionRange(matches[0].length, matches[0].length);
+              entityInput.dispatchEvent(new Event("input", { bubbles: true }));
+              e.preventDefault();
             }
+          }
+        }
+      };
+      possibleOptions.forEach((opt) => {
+        const cb = this.shadowRoot.getElementById(`opt-${opt}`);
+        if (cb !== null) {
+          cb.onchange = this._onOptionToggled.bind(this);
+        }
+      });
+      if (focusId) {
+        const toFocus = this.shadowRoot.getElementById(focusId);
+        if (toFocus) {
+          toFocus.focus();
+          if (caretPos !== null && toFocus.setSelectionRange) {
+            toFocus.setSelectionRange(caretPos, caretPos);
+          }
+        }
+      }
+      const nameInput = this.shadowRoot.getElementById("badge-name");
+      if (nameInput) {
+        nameInput.oninput = (e) => {
+          this._config.name = e.target.value;
+          this._emitConfigChanged();
         };
-        // Checkbox listeners
-        possibleOptions.forEach((opt) => {
-            const cb = this.shadowRoot.getElementById(`opt-${opt}`);
-            if (cb !== null) {
-                cb.onchange = this._onOptionToggled.bind(this);
-            }
-        });
-        // Restore focus/caret if possible
-        if (focusId) {
-            const toFocus = this.shadowRoot.getElementById(focusId);
-            if (toFocus) {
-                toFocus.focus();
-                if (caretPos !== null && toFocus.setSelectionRange) {
-                    toFocus.setSelectionRange(caretPos, caretPos);
-                }
-            }
-        }
-        const nameInput = this.shadowRoot.getElementById("badge-name");
-        if (nameInput) {
-            nameInput.oninput = (e) => {
-                this._config.name = e.target.value;
-                this._emitConfigChanged();
-            };
-        }
-        const iconInput = this.shadowRoot.getElementById("badge-icon");
-        if (iconInput) {
-            iconInput.oninput = (e) => {
-                this._config.icon = e.target.value;
-                this._emitConfigChanged();
-            };
-        }
+      }
+      const iconInput = this.shadowRoot.getElementById("badge-icon");
+      if (iconInput) {
+        iconInput.oninput = (e) => {
+          this._config.icon = e.target.value;
+          this._emitConfigChanged();
+        };
+      }
     }
-}
-const BADGE_VERSION = "__VERSION__";
-customElements.define("dropdown-list-badge", DropdownListBadge);
-customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
-// register the custom card in Home Assistant so it shows up as a custom badge
-window.customCards = window.customCards || [];
-window.customCards.push({
+  };
+  var BADGE_VERSION = "0.3.7-4";
+  customElements.define("dropdown-list-badge", DropdownListBadge);
+  customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
+  window.customCards = window.customCards || [];
+  window.customCards.push({
     type: "dropdown-list-badge",
     name: "Dropdown List Badge",
     description: "A badge with a dropdown for input_select entities."
-});
-export { DropdownListBadge };
-export { DropdownListBadgeEditor };
-//# sourceMappingURL=dropdown-list-badge.js.map
+  });
+})();
