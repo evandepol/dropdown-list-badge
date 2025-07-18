@@ -36,7 +36,7 @@
     "camelcase": "^7.0.1",
     "chalk": "^5.0.1",
     "chalk-template": "^0.4.0",
-    "cli-boxes": "^3.0.0",
+    "cli-boxes": "^4.0.1",
     "clipboardy": "^3.0.0",
     "color-convert": "^2.0.1",
     "color-name": "^2.0.0",
