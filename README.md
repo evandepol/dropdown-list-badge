@@ -165,6 +165,38 @@ icon: mdi:sofa
    - Test files are in the `tests/` directory (see `badge.spec.ts` for Playwright examples).
    - The test page is at `test/index.html` and uses a mock Home Assistant environment.
 
+### Environment Setup and Teardown
+
+To simplify starting and stopping your local Docker/Colima environment, use the provided scripts:
+
+#### Start the Docker/Colima Environment
+
+```sh
+./start-docker-env.sh
+```
+
+This script will:
+- Start Colima (if not already running)
+- Ensure the `jp` (JSON parser) tool is installed and available in the environment
+- Set up any additional environment variables or requirements for development
+
+#### Stop the Docker/Colima Environment
+
+```sh
+./stop-docker-env.sh
+```
+
+This script will:
+- Stop the Colima VM and clean up the Docker environment
+- Optionally remove any temporary containers or resources
+
+> **Tip:**  
+> Use these scripts before and after development or testing to ensure your environment is correctly set up and cleaned up.
+
+---
+
+Continue with the usual build and test steps as described above.
+
 ### Testing & Visual Regression
 
 ### Running Tests
