@@ -99,7 +99,7 @@
     "update-check": "^1.5.4",
     "uri-js": "^4.4.1",
     "vary": "^1.1.2",
-    "which": "^2.0.2",
+    "which": "^5.0.0",
     "widest-line": "^4.0.1",
     "wrap-ansi": "^9.0.0"
   },
