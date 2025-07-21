@@ -20,7 +20,7 @@
   - `./run-test.sh` builds, serves, and runs Playwright tests in Docker/Colima.
   - Visual regression snapshots and HTML reports in `tests/` and `tests/html-report/`.
 - **Environment:**
-  - Use `./start-docker-env.sh` and `./stop-docker-env.sh` to manage Colima/Docker and required tools (e.g., `jp`).
+  - Use `./start-docker-env.sh` and `./stop-docker-env.sh` to manage Colima/Docker and required tools (e.g., `jq`).
 - **CI/CD:**
   - GitHub Actions workflow (`validate.yaml`) uses Docker layer caching, builds/tests in a single job, and extracts/uploads artifacts from the built image.
   - Dist updates are committed via PR from `update-dist-artifact` branch.
