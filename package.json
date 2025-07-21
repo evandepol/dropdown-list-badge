@@ -46,7 +46,7 @@
     "content-disposition": "^0.5.2",
     "cross-spawn": "^7.0.6",
     "custom-card-helpers": "^1.9.0",
-    "debug": "^2.6.9",
+    "debug": "^4.4.1",
     "deep-extend": "^0.6.0",
     "eastasianwidth": "^0.2.0",
     "emoji-regex": "^10.4.0",
