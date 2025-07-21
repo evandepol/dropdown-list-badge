@@ -12,8 +12,6 @@ updates:
     # Check the npm registry for updates once a week
     schedule:
       interval: "weekly"
-    # Allow manual triggering of updates
-    allow-manual-trigger: true
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
@@ -22,5 +20,3 @@ updates:
     # Check for updates once a week
     schedule:
       interval: "weekly"
-    # Allow manual triggering of updates
-    allow-manual-trigger: true
