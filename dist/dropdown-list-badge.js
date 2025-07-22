@@ -596,13 +596,17 @@
       }
     }
   };
-  var BADGE_VERSION = "0.4.0";
+  var BADGE_VERSION = "0.4.1";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
-  var cards = globalThis.customCards = globalThis.customCards || [];
-  cards.push({
-    type: "dropdown-list-badge",
+  var myBadge = {
+    type: "custom:dropdown-list-badge",
     name: "Dropdown List Badge",
-    description: "A badge with a dropdown for input_select entities."
-  });
+    preview: true,
+    description: "A badge with a dropdown for input_select entities.",
+    documentationURL: "https://github.com/evandepol/dropdown-list-badge/README.md"
+  };
+  var customCardsWindow = window;
+  customCardsWindow.customBadges = customCardsWindow.customBadges || [];
+  customCardsWindow.customBadges.push(myBadge);
 })();
