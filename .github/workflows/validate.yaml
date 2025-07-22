@@ -73,6 +73,7 @@ jobs:
         run: |
           id=$(docker create dropdown-list-badge-test:latest)
           docker cp $id:/app/dist ./dist-artifact
+          docker cp $id:/app/version.json ./dist-artifact/version.json
           docker rm $id
 
       - name: Upload dist artifact
@@ -99,6 +100,10 @@ jobs:
         run: |
           rm -rf dist
           mv dist-artifact dist
+          # Move version.json to dist/version-published.json
+          if [ -f dist/version.json ]; then
+            mv dist/version.json dist/version-published.json
+          fi
 
       - name: Allow dist for CI
         run: echo "!dist/" >> .gitignore
@@ -117,58 +122,6 @@ jobs:
           base: main
           add-paths: dist/
           author: github-actions[bot] <github-actions[bot]@users.noreply.github.com>
-
-  tag_on_version_change:
-    runs-on: ubuntu-latest
-    needs: commit_dist
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Check if version.json changed
-        id: version_changed
-        run: |
-          if git show --name-only --pretty="" HEAD | grep -q "^version.json$"; then
-            echo "changed=true" >> $GITHUB_OUTPUT
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Stop if version.json not changed
-        if: steps.version_changed.outputs.changed == 'false'
-        run: |
-          echo "version.json not changed, skipping tag/release."
-          exit 0
-
-      - name: Read version from version.json
-        id: version
-        run: |
-          VERSION=$(jq -r .version version.json)
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Check if tag exists
-        id: check
-        run: |
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
-            echo "Tag already exists"
-            echo "tag_exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "tag_exists=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create tag and release
-        if: steps.check.outputs.tag_exists == 'false'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: v${{ steps.version.outputs.version }}
-          generate_release_notes: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   codeql-analysis:
     name: Analyze (${{ matrix.language }})

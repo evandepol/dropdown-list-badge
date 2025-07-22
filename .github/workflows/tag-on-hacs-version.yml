@@ -23,25 +23,25 @@ jobs:
           git fetch origin ${{ github.event.workflow_run.head_branch }}
           git checkout ${{ github.event.workflow_run.head_sha }}
 
-      - name: Check if version.json changed
+      - name: Check if dist/version-published.json changed
         id: version_changed
         run: |
-          if git show --name-only --pretty="" ${{ github.event.workflow_run.head_sha }} | grep -q "^version.json$"; then
+          if git show --name-only --pretty="" ${{ github.event.workflow_run.head_sha }} | grep -q "^dist/version-published.json$"; then
             echo "changed=true" >> $GITHUB_OUTPUT
           else
             echo "changed=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Stop if version.json not changed
+      - name: Stop if dist/version-published.json not changed
         if: steps.version_changed.outputs.changed == 'false'
         run: |
-          echo "version.json not changed, skipping tag/release."
+          echo "dist/version-published.json not changed, skipping tag/release."
           exit 0
 
-      - name: Read version from version.json
+      - name: Read version from dist/version-published.json
         id: version
         run: |
-          VERSION=$(jq -r .version version.json)
+          VERSION=$(jq -r .version dist/version-published.json)
           echo "version=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Check if tag exists
