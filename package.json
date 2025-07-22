@@ -70,7 +70,7 @@
     "minimatch": "^10.0.3",
     "minimist": "^1.2.8",
     "ms": "^2.0.0",
-    "negotiator": "^0.6.3",
+    "negotiator": "^1.0.0",
     "npm-run-path": "^4.0.1",
     "on-headers": "^1.1.0",
     "onetime": "^7.0.0",
