@@ -596,7 +596,7 @@
       }
     }
   };
-  var BADGE_VERSION = "0.4.7";
+  var BADGE_VERSION = "0.4.8";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
   var customCardsWindow = window;
