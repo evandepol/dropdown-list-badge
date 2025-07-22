@@ -707,13 +707,23 @@ const BADGE_VERSION = "__VERSION__";
 customElements.define("dropdown-list-badge", DropdownListBadge);
 customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
 
-// register the custom card in Home Assistant so it shows up as a custom badge
-const cards = (globalThis as any).customCards = (globalThis as any).customCards || [];
-cards.push({
-  type: "dropdown-list-badge",
+
+// Define your custom badge details
+const myBadge = {
+  type: "custom:dropdown-list-badge",
   name: "Dropdown List Badge",
-  description: "A badge with a dropdown for input_select entities."
-});
+  preview: true,
+  description: "A badge with a dropdown for input_select entities.",
+  documentationURL: "https://github.com/evandepol/dropdown-list-badge/README.md",
+};
+
+// Safely add your badge to the global window.customBadges array
+const customCardsWindow = window as typeof window & {
+  customBadges?: typeof myBadge[];
+};
+
+customCardsWindow.customBadges = customCardsWindow.customBadges || [];
+customCardsWindow.customBadges.push(myBadge);
 
 export { DropdownListBadge };
 export { DropdownListBadgeEditor };
