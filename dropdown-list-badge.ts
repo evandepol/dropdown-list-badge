@@ -711,10 +711,10 @@ customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
 
 // Register the actual DropdownListBadge class in global customCards for Home Assistant discovery
 const customCardsWindow = window as typeof window & {
-  customCards?: any[];
+  customBadges?: any[];
 };
-customCardsWindow.customCards = customCardsWindow.customCards || [];
-customCardsWindow.customCards.push({
+customCardsWindow.customBadges = customCardsWindow.customBadges || [];
+customCardsWindow.customBadges.push({
   type: "custom:dropdown-list-badge",
   name: "Dropdown List Badge",
   preview: true,
