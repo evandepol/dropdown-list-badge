@@ -52,7 +52,7 @@ class DropdownListBadge extends HTMLElement {
   }
 
   static getStubConfig() {
-    return { entity: 'input_select.example', name: 'Dropdown',  options: ['Option 1', 'Option 2', 'Option 3']  };
+    return { entity: 'input_select.example', name: 'Dropdown', options: ['Option 1', 'Option 2', 'Option 3'] };
   }
 
   _openDropdown() {
