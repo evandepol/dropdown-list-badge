@@ -202,8 +202,10 @@ class DropdownListBadge extends HTMLElement {
 
     const state = this._hass.states[this._config.entity];
     if (!state) {
-      this.innerHTML = `<span style="color: red;">Entity not found</span>`;
-      return;
+      if (state !== 'input_select.example') {
+        this.innerHTML = `<span style="color: red;">Entity not found</span>`;
+        return;
+      }
     }
 
     const current = state.state;
