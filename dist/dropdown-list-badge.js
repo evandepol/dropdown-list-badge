@@ -43,7 +43,7 @@
       return document.createElement("dropdown-list-badge-editor");
     }
     static getStubConfig() {
-      return { entity: "input_select.example", options: ["Option 1", "Option 2", "Option 3"] };
+      return { entity: "input_select.example", name: "Dropdown", options: ["Option 1", "Option 2", "Option 3"] };
     }
     _openDropdown() {
       this._dropdownOpen = true;
@@ -130,7 +130,26 @@
       this._closeDropdown();
     }
     _render() {
-      if (!this._hass || !this._hass.states || !this._config) return;
+      if (!this._config) {
+        this.innerHTML = `<span>Dropdown List Badge (preview)</span>`;
+        return;
+      }
+      if (!this._hass || !this._hass.states) {
+        const options2 = this._config.options || [];
+        const name2 = this._config.name || "Dropdown List Badge";
+        this.innerHTML = `
+        <div class="badge-wrapper">
+          <div class="dropdown-badge">
+            <div class="badge-name-inside">${name2}</div>
+            <div class="badge-content-row">
+              <span class="dropdown-value">${options2[0] || "Option"}</span>
+              <span class="dropdown-arrow" aria-hidden="true">\u25BC</span>
+            </div>
+          </div>
+        </div>
+      `;
+        return;
+      }
       const state = this._hass.states[this._config.entity];
       if (!state) {
         this.innerHTML = `<span style="color: red;">Entity not found</span>`;
@@ -596,13 +615,13 @@
       }
     }
   };
-  var BADGE_VERSION = "0.4.9";
+  var BADGE_VERSION = "0.4.10";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
   var customCardsWindow = window;
   customCardsWindow.customBadges = customCardsWindow.customBadges || [];
   customCardsWindow.customBadges.push({
-    type: "dropdown-list-badge",
+    type: "custom:dropdown-list-badge",
     name: "Dropdown List Badge",
     preview: true,
     description: "A badge with a dropdown for input_select entities.",
