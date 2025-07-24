@@ -34,7 +34,7 @@ class DropdownListBadge extends HTMLElement {
     this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
-  setConfig(config: DropdownListBadgeConfig) {
+  public setConfig(config: DropdownListBadgeConfig) {
     if (!config.entity || !Array.isArray(config.options)) {
       throw new Error("dropdown-list-badge requires 'entity' and 'options'");
     }
@@ -42,9 +42,17 @@ class DropdownListBadge extends HTMLElement {
     this._render();
   }
 
-  set hass(hass: HomeAssistant) {
+  public set hass(hass: HomeAssistant) {
     this._hass = hass;
     if (this._config) this._render();
+  }
+
+  public get config() {
+    return this._config;
+  }
+
+  public get hass() {
+    return this._hass;
   }
 
   static getConfigElement() {
@@ -176,7 +184,7 @@ class DropdownListBadge extends HTMLElement {
     }
     if (!this._hass || !this._hass.states) {
       // Render a static preview with config only
-      const options = this._config.options || [];
+      const options = this._config.options || ['Option 1', 'Option 2', 'Option 3'];
       const name = this._config.name || "Dropdown List Badge";
       this.innerHTML = `
         <div class="badge-wrapper">
@@ -729,14 +737,14 @@ customElements.define("dropdown-list-badge", DropdownListBadge);
 customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
 
 
-
 // Register the actual DropdownListBadge class in global customCards for Home Assistant discovery
 const customCardsWindow = window as typeof window & {
   customBadges?: any[];
 };
 customCardsWindow.customBadges = customCardsWindow.customBadges || [];
 customCardsWindow.customBadges.push({
-  type: "custom:dropdown-list-badge",
+  //type: "custom:dropdown-list-badge",
+  type: "dropdown-list-badge",
   name: "Dropdown List Badge",
   preview: true,
   description: "A badge with a dropdown for input_select entities.",
