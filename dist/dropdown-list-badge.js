@@ -39,6 +39,12 @@
       this._hass = hass;
       if (this._config) this._render();
     }
+    get config() {
+      return this._config;
+    }
+    get hass() {
+      return this._hass;
+    }
     static getConfigElement() {
       return document.createElement("dropdown-list-badge-editor");
     }
@@ -135,7 +141,7 @@
         return;
       }
       if (!this._hass || !this._hass.states) {
-        const options2 = this._config.options || [];
+        const options2 = this._config.options || ["Option 1", "Option 2", "Option 3"];
         const name2 = this._config.name || "Dropdown List Badge";
         this.innerHTML = `
         <div class="badge-wrapper">
@@ -615,13 +621,14 @@
       }
     }
   };
-  var BADGE_VERSION = "0.4.10";
+  var BADGE_VERSION = "0.4.11";
   customElements.define("dropdown-list-badge", DropdownListBadge);
   customElements.define("dropdown-list-badge-editor", DropdownListBadgeEditor);
   var customCardsWindow = window;
   customCardsWindow.customBadges = customCardsWindow.customBadges || [];
   customCardsWindow.customBadges.push({
-    type: "custom:dropdown-list-badge",
+    //type: "custom:dropdown-list-badge",
+    type: "dropdown-list-badge",
     name: "Dropdown List Badge",
     preview: true,
     description: "A badge with a dropdown for input_select entities.",
