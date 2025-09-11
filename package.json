@@ -37,7 +37,7 @@
     "chalk": "^5.6.0",
     "chalk-template": "^0.4.0",
     "cli-boxes": "^4.0.1",
-    "clipboardy": "^3.0.0",
+    "clipboardy": "^4.0.0",
     "color-convert": "^2.0.1",
     "color-name": "^2.0.0",
     "compressible": "^2.0.18",
