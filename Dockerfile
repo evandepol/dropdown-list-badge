@@ -8,15 +8,12 @@ WORKDIR /app
 COPY package.json ./
 # Use npm install which is more forgiving of platform-specific optional dependencies
 RUN npm install --omit=optional
-# Install Playwright browsers
-RUN npx playwright install --with-deps
 
 # Stage 2: Build the application
 FROM base AS builder
 WORKDIR /app
 # Copy dependencies from the previous stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /ms-playwright /ms-playwright
 RUN apt-get update && apt-get install -y jq && rm -rf /var/lib/apt/lists/*
 # Copy all source files
 COPY . .
