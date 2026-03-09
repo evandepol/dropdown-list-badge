@@ -36,10 +36,12 @@ docker build -t $IMAGE .
 
 # Ensure test artifact directories exist and are writable
 mkdir -p tests/test-results
-chmod -R 777 tests/test-results
 mkdir -p tests/html-report
-chmod -R 777 tests/html-report
 mkdir -p tests/__snapshots__
+# Fix any root-owned files from previous Docker runs so chmod can succeed
+sudo chown -R "$(id -u):$(id -g)" tests/test-results tests/html-report tests/__snapshots__ 2>/dev/null || true
+chmod -R 777 tests/test-results
+chmod -R 777 tests/html-report
 chmod -R 777 tests/__snapshots__
 
 echo "Starting server container..."
