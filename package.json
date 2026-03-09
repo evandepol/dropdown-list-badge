@@ -5,7 +5,7 @@
     "@playwright/test": "1.55.0",
     "@types/node": "^24.1.0",
     "esbuild": "^0.25.8",
-    "serve": "^14.2.0",
+    "serve": "^14.2.6",
     "typescript": "^5.9.2"
   },
   "scripts": {
